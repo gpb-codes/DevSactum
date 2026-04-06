@@ -7,7 +7,7 @@
 
 [![GitHub](https://img.shields.io/badge/GitHub-devsactum-0d1117?style=flat-square&logo=github&logoColor=white&labelColor=1a1a2e)](https://github.com/devsactum/devsactum)
 [![Wiki](https://img.shields.io/badge/Wiki-Documentación_técnica-0d1117?style=flat-square&logo=gitbook&logoColor=white&labelColor=1a1a2e)](https://github.com/devsactum/devsactum/wiki)
-[![Email](https://img.shields.io/badge/Email-hola%40devsactum.dev-0d1117?style=flat-square&logo=gmail&logoColor=white&labelColor=1a1a2e)](mailto:hola@devsactum.dev)
+[![Email](https://img.shields.io/badge/Email-g.devsactum%40gmail.com-0d1117?style=flat-square&logo=gmail&logoColor=white&labelColor=1a1a2e)](mailto:hola@devsactum.dev)
 [![Waitlist](https://img.shields.io/badge/●%20Beta%20abierta-Anotate_ahora-0d1117?style=flat-square&labelColor=1a1a2e&color=a855f7)](https://devsactum.dev/waitlist)
 
 </div>
@@ -129,7 +129,7 @@
 
 [![GitHub](https://img.shields.io/badge/─%20%40devsactum-0d1117?style=for-the-badge&logo=github&logoColor=white&labelColor=161b22)](https://github.com/devsactum/devsactum)
 [![Wiki](https://img.shields.io/badge/─%20Documentación_técnica-0d1117?style=for-the-badge&logo=gitbook&logoColor=white&labelColor=161b22)](https://github.com/devsactum/devsactum/wiki)
-[![Email](https://img.shields.io/badge/─%20hola%40devsactum.dev-0d1117?style=for-the-badge&logo=gmail&logoColor=EA4335&labelColor=161b22)](mailto:hola@devsactum.dev)
+[![Email](https://img.shields.io/badge/─%20hola%40devsactum.dev-0d1117?style=for-the-badge&logo=gmail&logoColor=EA4335&labelColor=161b22)](mailto:g.devsactum@gmail.com)
 
 </div>
 
