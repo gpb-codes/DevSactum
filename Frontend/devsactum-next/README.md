@@ -42,16 +42,3 @@ Diseñado para desarrollo rápido, escalabilidad y despliegue optimizado.
 ![Vercel](https://img.shields.io/badge/Vercel-0d1117?style=for-the-badge&logo=vercel&logoColor=white)
 
 </div>
-
----
-
-## Instalación
-
-```bash
-git clone https://github.com/tuusuario/tu-repo.git
-
-cd tu-repo
-
-npm install
-
-npm run dev
