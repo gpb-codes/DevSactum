@@ -1,8 +1,7 @@
 "use client"
 
 import React, { createContext, useContext, useState } from "react"
-
-export type Page = "Feed" | "Explorar" | "Comunidades" | "Guardados" | "Chat" | "Login"
+import type { Page } from "@/types"
 
 interface NavContextType {
   activePage: Page
