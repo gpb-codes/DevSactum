@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import "./globals.css"
 
 export const metadata: Metadata = {
-  title: "Devsanctum — Red social para developers",
+  title: "Devsanctum",
   description: "Plataforma social para desarrolladores. Comparte proyectos, conecta con la comunidad y crece profesionalmente.",
   keywords: ["developers", "programming", "social", "code", "community"],
 }
