@@ -1,36 +1,56 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# DevSactum - Frontend
+
+Aplicacion web para la plataforma social de desarrolladores.
+
+## Stack
+
+- **Next.js 14** - Framework React
+- **TypeScript** - Tipado estatico
+- **Tailwind CSS** - Estilos
+
+## Backends
+
+- **Go API** (puerto 8000) - API principal con Gin
+- **NestJS API** (puerto 8001) - API complementaria con TypeORM
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+# Instalar dependencias
+pnpm install
+
+# Desarrollo
 pnpm dev
-# or
-bun dev
+
+# Build
+pnpm build
+
+# Start
+pnpm start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) with your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Estructura
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+src/
+  components/    - Componentes UI
+  features/      - Modulos por feature
+  hooks/         - Custom hooks
+  lib/           - Utilidades
+  store/         - Estado global
+  types/         - Tipos TypeScript
+```
 
-## Learn More
+## API
 
-To learn more about Next.js, take a look at the following resources:
+El frontend se conecta a dos backends:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Go API (Principal)
+- Auth, Posts, Communities, Messages, Reputation
+- Puerto: 8000
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### NestJS API (Complementaria)
+- Endpoints adicionales
+- Puerto: 8001

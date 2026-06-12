@@ -1,23 +1,43 @@
 services:
   web:
     build:
-      context: ./apps/web
+      context: ./Frontend/devsactum-next
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
     environment:
       - NEXT_PUBLIC_API_URL=http://localhost:8000
+      - NEXT_PUBLIC_NESTJS_URL=http://localhost:8001
     depends_on:
-      - api
+      - go-api
+      - nestjs-api
 
-  api:
+  go-api:
     build:
-      context: ./apps/api
+      context: ./backend/go-api
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
     environment:
       - DATABASE_URL=postgresql://devsactum:devsactum@db:5432/devsactum
+      - PORT=8000
+    depends_on:
+      - db
+
+  nestjs-api:
+    build:
+      context: ./backend/nestjs-api
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=devsactum
+      - DB_PASSWORD=devsactum
+      - DB_NAME=devsactum
+      - JWT_SECRET=devsactum-secret-key-change-in-production
+      - PORT=8001
     depends_on:
       - db
 
