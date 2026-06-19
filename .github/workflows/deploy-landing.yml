@@ -1,0 +1,35 @@
+name: Deploy Landing to Cloudflare Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "landing-app/**"
+  workflow_dispatch:
+
+jobs:
+  deploy-landing:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./landing-app/frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+          cache-dependency-path: ./landing-app/frontend/package-lock.json
+
+      - run: npm ci
+
+      - run: npm run build
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy out --project-name=devsactum-landing
+          workingDirectory: ./landing-app/frontend
