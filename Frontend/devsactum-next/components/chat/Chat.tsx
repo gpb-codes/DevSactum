@@ -1,7 +1,10 @@
 "use client"
 
-import React, { useState, useRef, useEffect } from "react"
+import React, { useState, useRef, useEffect, useCallback } from "react"
 import { Send, Search, MoreVertical, Phone, Video, Check, CheckCheck } from "lucide-react"
+import { messageService, type Message } from "@/services/messages"
+import { useJobAuth } from "@/context/JobAuthContext"
+import { useWebSocket, type WSMessage } from "@/lib/websocket"
 
 const TRENDS = [
   { category: "Diseño · Popular", name: "#sistemaDiseño", count: "84 posts" },
@@ -22,16 +25,16 @@ const STATUS_COLOR: Record<string, string> = {
 }
 
 const CONTACTS = [
-  { id: 1, initials: "AR", name: "Alex Rivet",  last: "Acabo de hacer push al repo 🚀",     time: "2m",  unread: 3, online: true,  color: "#c49aff", bg: "rgba(196,154,255,.15)" },
+  { id: 1, initials: "AR", name: "Alex Rivet",  last: "Acabo de hacer push al repo",     time: "2m",  unread: 3, online: true,  color: "#c49aff", bg: "rgba(196,154,255,.15)" },
   { id: 2, initials: "SC", name: "Sarah Chen",  last: "¿Revisaste el PR que mandé?",        time: "14m", unread: 0, online: true,  color: "#ff94a8", bg: "rgba(255,148,168,.15)" },
-  { id: 3, initials: "MR", name: "María R.",    last: "El diseño nuevo se ve increíble 🎨", time: "1h",  unread: 1, online: false, color: "#4ade80", bg: "rgba(74,222,128,.12)" },
+  { id: 3, initials: "MR", name: "María R.",    last: "El diseño nuevo se ve increíble", time: "1h",  unread: 1, online: false, color: "#4ade80", bg: "rgba(74,222,128,.12)" },
   { id: 4, initials: "JL", name: "Juan López",  last: "Nos vemos en el standup",            time: "3h",  unread: 0, online: false, color: "#60a5fa", bg: "rgba(96,165,250,.12)" },
   { id: 5, initials: "DV", name: "Dev Team",    last: "Carlos: CI pasó ✅",                 time: "5h",  unread: 7, online: false, color: "#f59e0b", bg: "rgba(245,158,11,.12)" },
 ]
 
 const INITIAL_MESSAGES: Record<number, { id: number; text: string; mine: boolean; time: string; read: boolean }[]> = {
   1: [
-    { id: 1, text: "Hey, acabo de hacer push al repo con los cambios del auth 🚀", mine: false, time: "10:32", read: true },
+    { id: 1, text: "Hey, acabo de hacer push al repo con los cambios del auth", mine: false, time: "10:32", read: true },
     { id: 2, text: "Genial! Lo reviso ahora", mine: true, time: "10:33", read: true },
     { id: 3, text: "Hay un bug en el middleware, lo ves?", mine: false, time: "10:35", read: true },
     { id: 4, text: "Sí lo veo, lo fixeo en unos minutos", mine: true, time: "10:36", read: false },
@@ -40,35 +43,115 @@ const INITIAL_MESSAGES: Record<number, { id: number; text: string; mine: boolean
     { id: 1, text: "¿Revisaste el PR que mandé ayer?", mine: false, time: "09:15", read: true },
     { id: 2, text: "Todavía no, lo hago ahora", mine: true, time: "09:20", read: true },
   ],
-  3: [{ id: 1, text: "El diseño nuevo se ve increíble 🎨", mine: false, time: "08:00", read: true }],
+  3: [{ id: 1, text: "El diseño nuevo se ve increíble", mine: false, time: "08:00", read: true }],
   4: [{ id: 1, text: "Nos vemos en el standup a las 10", mine: false, time: "07:45", read: true }],
   5: [{ id: 1, text: "CI pasó en todos los branches ✅", mine: false, time: "06:30", read: true }],
 }
 
 export default function Chat() {
+  const { user } = useJobAuth()
   const [activeChat, setActiveChat] = useState(1)
-  const [messages, setMessages] = useState(INITIAL_MESSAGES)
   const [input, setInput] = useState("")
   const [search, setSearch] = useState("")
-  const bottomRef = useRef<HTMLDivElement>(null)
+  const [messages, setMessages] = useState(INITIAL_MESSAGES)
+  const [typingUsers, setTypingUsers] = useState<Set<string>>(new Set())
+  const bottomRef = useRef<HTMLDivElement | null>(null)
 
-  const contact = CONTACTS.find((c) => c.id === activeChat)!
-  const filtered = CONTACTS.filter((c) => c.name.toLowerCase().includes(search.toLowerCase()))
+  const { state: wsState, sendDM, sendTyping } = useWebSocket({
+    userId: user?.id || "anonymous",
+    onMessage: useCallback((msg: WSMessage) => {
+      if (msg.type === "direct_message") {
+        const now = new Date()
+        const time = `${now.getHours()}:${String(now.getMinutes()).padStart(2, "0")}`
+        setMessages(prev => ({
+          ...prev,
+          [activeChat]: [...(prev[activeChat] || []), {
+            id: Date.now(),
+            text: msg.content || "",
+            mine: msg.senderId === user?.id,
+            time,
+            read: false,
+          }],
+        }))
+      }
+      if (msg.type === "typing") {
+        const tid = msg.senderId || ""
+        setTypingUsers(prev => {
+          const next = new Set(prev)
+          if ((msg.data as { isTyping?: boolean })?.isTyping) {
+            next.add(tid)
+          } else {
+            next.delete(tid)
+          }
+          return next
+        })
+      }
+    }, [activeChat, user?.id]),
+  })
+
+  const filtered = CONTACTS.filter(c =>
+    c.name.toLowerCase().includes(search.toLowerCase())
+  )
+
+  const contact = CONTACTS[activeChat - 1] || CONTACTS[0]
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [activeChat, messages])
 
-  function sendMessage() {
+  useEffect(() => {
+    if (!user) return
+    loadMessages()
+  }, [user])
+
+  async function loadMessages() {
+    if (!user) return
+    try {
+      const contact = CONTACTS[activeChat - 1]
+      if (!contact) return
+      const apiMessages = await messageService.getDirect(user.id, contact.name)
+      if (apiMessages.length > 0) {
+        const mapped = apiMessages.map(m => ({
+          id: parseInt(m.id) || Date.now(),
+          text: m.content,
+          mine: m.senderId === user.id,
+          time: new Date(m.createdAt).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" }),
+          read: m.read,
+        }))
+        setMessages(prev => ({ ...prev, [activeChat]: mapped }))
+      }
+    } catch {
+      // Keep mock data
+    }
+  }
+
+  async function sendMessage() {
     const text = input.trim()
     if (!text) return
     const now = new Date()
     const time = `${now.getHours()}:${String(now.getMinutes()).padStart(2, "0")}`
+
+    // Optimistic update
     setMessages((prev) => ({
       ...prev,
       [activeChat]: [...(prev[activeChat] || []), { id: Date.now(), text, mine: true, time, read: false }],
     }))
     setInput("")
+
+    // Send via WebSocket
+    const contact = CONTACTS[activeChat - 1]
+    if (contact && user) {
+      sendDM(contact.name, text, user.name)
+    }
+
+    // Also send to API for persistence
+    if (user) {
+      try {
+        await messageService.send({ content: text, receiverId: contact.name })
+      } catch {
+        // WebSocket already delivered
+      }
+    }
   }
 
   return (
@@ -148,7 +231,12 @@ export default function Chat() {
             <div>
               <div className="text-[13px] font-bold text-text-h">{contact.name}</div>
               <div className={`text-[11px] ${contact.online ? "text-online" : "text-text opacity-60"}`}>
-                {contact.online ? "en línea" : "desconectado"}
+                {typingUsers.has(contact.name)
+                  ? "escribiendo..."
+                  : contact.online ? "en línea" : "desconectado"
+                }
+                {wsState === "connected" && <span className="ml-1 text-[8px] text-success">●</span>}
+                {wsState === "disconnected" && <span className="ml-1 text-[8px] text-danger">●</span>}
               </div>
             </div>
           </div>
@@ -185,8 +273,18 @@ export default function Chat() {
         <div className="px-5 py-3 border-t border-border flex gap-2.5 items-center">
           <input
             value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+            onChange={(e) => {
+              setInput(e.target.value)
+              if (e.target.value.length > 0) {
+                sendTyping(contact.name, true)
+              } else {
+                sendTyping(contact.name, false)
+              }
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") sendMessage()
+            }}
+            onBlur={() => sendTyping(contact.name, false)}
             placeholder="Escribe un mensaje..."
             className="flex-1 bg-bg-surface border border-border rounded-lg px-3.5 py-2.5 text-[13px] text-text-h outline-none"
           />

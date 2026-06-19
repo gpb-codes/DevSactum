@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from "react"
 import { Search, Bell, X, Command } from "lucide-react"
 import { useNav } from "@/context/NavContext"
+import { NotificationsBadge } from "@/components/notifications/NotificationsBadge"
 import type { Page } from "@/types"
 
 const SUGGESTIONS: { label: string; type: string; page?: Page }[] = [
@@ -143,14 +144,7 @@ export default function Topbar() {
 
       {/* Right */}
       <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-        <button
-          onClick={() => setActivePage("Notificaciones")}
-          style={{ position: "relative", width: 32, height: 32, background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 8, color: "var(--color-text)" }}
-          className="hover:bg-bg-hover hover:text-text-h transition-colors"
-        >
-          <Bell size={15} strokeWidth={1.8} />
-          <span style={{ position: "absolute", top: 6, right: 6, width: 6, height: 6, borderRadius: "50%", background: "var(--color-tertiary)" }} />
-        </button>
+        <NotificationsBadge />
         <button
           onClick={() => setActivePage("Perfil")}
           style={{ width: 32, height: 32, borderRadius: "50%", background: "var(--color-accent-bg)", border: "1px solid var(--color-accent-border)", fontSize: 11, fontWeight: 700, color: "var(--color-accent)", cursor: "pointer" }}

@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+	"time"
 
 	"github.com/gpb-codes/DevSactum/backend/go-api/internal/models"
 	"github.com/google/uuid"
@@ -28,14 +29,14 @@ func GetProfileByUserID(userID uuid.UUID) (*models.Profile, error) {
 }
 
 func UpdateProfile(profile *models.Profile) error {
-	query := `UPDATE profiles SET stack = $2, level = $3, github_username = $4, website = $5, updated_at = NOW()
+	query := `UPDATE profiles SET stack = $2, level = $3, github_username = $4, website = $5, updated_at = $6
 			  WHERE user_id = $1 RETURNING updated_at`
 	return DB.QueryRow(query, profile.UserID, pq.Array(profile.Stack),
-		profile.Level, profile.GitHubUsername, profile.Website).Scan(&profile.UpdatedAt)
+		profile.Level, profile.GitHubUsername, profile.Website, time.Now()).Scan(&profile.UpdatedAt)
 }
 
 func IncrementReputation(userID uuid.UUID, points int) error {
-	_, err := DB.Exec("UPDATE profiles SET reputation_score = reputation_score + $2, updated_at = NOW() WHERE user_id = $1", userID, points)
+	_, err := DB.Exec("UPDATE profiles SET reputation_score = reputation_score + $2, updated_at = $3 WHERE user_id = $1", userID, points, time.Now())
 	return err
 }
 

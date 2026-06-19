@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+	"time"
 
 	"github.com/gpb-codes/DevSactum/backend/go-api/internal/models"
 	"github.com/google/uuid"
@@ -103,12 +104,12 @@ func GetPostsByTag(tag string, limit, offset int) ([]models.Post, error) {
 }
 
 func LikePost(postID uuid.UUID) error {
-	_, err := DB.Exec("UPDATE posts SET likes_count = likes_count + 1, updated_at = NOW() WHERE id = $1", postID)
+	_, err := DB.Exec("UPDATE posts SET likes_count = likes_count + 1, updated_at = $2 WHERE id = $1", postID, time.Now())
 	return err
 }
 
 func UnlikePost(postID uuid.UUID) error {
-	_, err := DB.Exec("UPDATE posts SET likes_count = GREATEST(likes_count - 1, 0), updated_at = NOW() WHERE id = $1", postID)
+	_, err := DB.Exec("UPDATE posts SET likes_count = MAX(likes_count - 1, 0), updated_at = $2 WHERE id = $1", postID, time.Now())
 	return err
 }
 

@@ -1,9 +1,0 @@
-node_modules/
-.next/
-out/
-.open-next/
-dist/
-*.exe
-*.log
-.env
-.env.local

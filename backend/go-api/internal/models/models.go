@@ -99,3 +99,58 @@ type SendMessageRequest struct {
 	CommunityID *string `json:"community_id"`
 	Content     string  `json:"content" binding:"required"`
 }
+
+type Job struct {
+	ID             uuid.UUID `json:"id" db:"id"`
+	CompanyID      uuid.UUID `json:"company_id" db:"company_id"`
+	Title          string    `json:"title" db:"title"`
+	Location       *string   `json:"location" db:"location"`
+	Remote         bool      `json:"remote" db:"remote"`
+	JobType        string    `json:"job_type" db:"job_type"`
+	ExperienceLevel string   `json:"experience_level" db:"experience_level"`
+	SalaryMin      *int      `json:"salary_min" db:"salary_min"`
+	SalaryMax      *int      `json:"salary_max" db:"salary_max"`
+	Currency       string    `json:"currency" db:"currency"`
+	Description    *string   `json:"description" db:"description"`
+	Requirements   []string  `json:"requirements" db:"requirements"`
+	Benefits       []string  `json:"benefits" db:"benefits"`
+	Tags           []string  `json:"tags" db:"tags"`
+	ApplicantsCount int     `json:"applicants_count" db:"applicants_count"`
+	IsFeatured     bool      `json:"is_featured" db:"is_featured"`
+	IsUrgent       bool      `json:"is_urgent" db:"is_urgent"`
+	IsActive       bool      `json:"is_active" db:"is_active"`
+	PostedAt       time.Time `json:"posted_at" db:"posted_at"`
+	UpdatedAt      time.Time `json:"updated_at" db:"updated_at"`
+}
+
+type JobApplication struct {
+	ID           uuid.UUID `json:"id" db:"id"`
+	JobID        uuid.UUID `json:"job_id" db:"job_id"`
+	DeveloperID  uuid.UUID `json:"developer_id" db:"developer_id"`
+	Status       string    `json:"status" db:"status"`
+	CoverLetter  *string   `json:"cover_letter" db:"cover_letter"`
+	Portfolio    *string   `json:"portfolio" db:"portfolio"`
+	AppliedAt    time.Time `json:"applied_at" db:"applied_at"`
+}
+
+type CreateJobRequest struct {
+	Title           string   `json:"title" binding:"required"`
+	Location        *string  `json:"location"`
+	Remote          bool     `json:"remote"`
+	JobType         string   `json:"job_type"`
+	ExperienceLevel string   `json:"experience_level"`
+	SalaryMin       *int     `json:"salary_min"`
+	SalaryMax       *int     `json:"salary_max"`
+	Currency        string   `json:"currency"`
+	Description     *string  `json:"description"`
+	Requirements    []string `json:"requirements"`
+	Benefits        []string `json:"benefits"`
+	Tags            []string `json:"tags"`
+	IsFeatured      bool     `json:"is_featured"`
+	IsUrgent        bool     `json:"is_urgent"`
+}
+
+type ApplyToJobRequest struct {
+	CoverLetter string `json:"cover_letter" binding:"required"`
+	Portfolio   string `json:"portfolio"`
+}

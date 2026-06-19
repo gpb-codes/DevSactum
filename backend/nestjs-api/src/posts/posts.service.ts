@@ -44,7 +44,7 @@ export class PostsService {
 
   async findByTag(tag: string, limit = 20, offset = 0): Promise<Post[]> {
     const query = this.postsRepository.createQueryBuilder('post');
-    query.where(':tag = ANY(post.tags)', { tag });
+    query.where("post.tags LIKE :tag", { tag: `%${tag}%` });
     query.orderBy('post.created_at', 'DESC');
     query.take(limit);
     query.skip(offset);

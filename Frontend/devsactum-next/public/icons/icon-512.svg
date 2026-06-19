@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#020617"/>
+  <rect x="64" y="64" width="384" height="384" rx="64" fill="#111114" stroke="#fb923c" stroke-width="4"/>
+  <text x="256" y="280" text-anchor="middle" font-family="system-ui, sans-serif" font-size="120" font-weight="900" fill="#fb923c">D</text>
+  <text x="256" y="380" text-anchor="middle" font-family="system-ui, sans-serif" font-size="32" font-weight="700" fill="#a1a1aa">DEVsanctum</text>
+</svg>

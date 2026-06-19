@@ -4,6 +4,7 @@ import React, { useState } from "react"
 import { Terminal, AtSign, Lock, Eye, EyeOff, GitBranch, Sparkles, ArrowRight } from "lucide-react"
 import { useNav } from "@/context/NavContext"
 import { useToast } from "@/components/ui/Toast"
+import { validateEmail, validatePassword, validateName, getPasswordStrength } from "@/lib/validation"
 
 export default function Login() {
   const { setActivePage } = useNav()
@@ -12,13 +13,32 @@ export default function Login() {
   const [tab, setTab] = useState<"signin" | "signup">("signin")
   const [form, setForm] = useState({ email: "", password: "", name: "" })
   const [loading, setLoading] = useState(false)
+  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [touched, setTouched] = useState<Record<string, boolean>>({})
+
+  function validate(): boolean {
+    const newErrors: Record<string, string> = {}
+    if (tab === "signup") {
+      const nameErr = validateName(form.name)
+      if (nameErr) newErrors.name = nameErr
+    }
+    const emailErr = validateEmail(form.email)
+    if (emailErr) newErrors.email = emailErr
+    const passErr = validatePassword(form.password)
+    if (passErr) newErrors.password = passErr
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+
+  function handleBlur(field: string) {
+    setTouched(prev => ({ ...prev, [field]: true }))
+    validate()
+  }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!form.email || !form.password) {
-      error("Campos requeridos", "Completa todos los campos")
-      return
-    }
+    setTouched({ email: true, password: true, name: true })
+    if (!validate()) return
     setLoading(true)
     setTimeout(() => {
       setLoading(false)
@@ -26,6 +46,8 @@ export default function Login() {
       setTimeout(() => setActivePage("Feed"), 800)
     }, 1200)
   }
+
+  const passwordStrength = getPasswordStrength(form.password)
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-bg relative overflow-hidden p-6 w-full">
@@ -75,8 +97,12 @@ export default function Login() {
                   placeholder="Alex Volkov"
                   value={form.name}
                   onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
-                  className="w-full h-[44px] px-[14px] bg-bg border border-border rounded-[9px] text-[13px] text-text-h outline-none transition-colors focus:border-accent-border"
+                  onBlur={() => handleBlur("name")}
+                  className={`w-full h-[44px] px-[14px] bg-bg border rounded-[9px] text-[13px] text-text-h outline-none transition-colors ${
+                    touched.name && errors.name ? "border-danger" : "border-border focus:border-accent-border"
+                  }`}
                 />
+                {touched.name && errors.name && <p className="text-[10px] text-danger mt-1 m-0">{errors.name}</p>}
               </div>
             )}
 
@@ -92,9 +118,13 @@ export default function Login() {
                   placeholder="dev@sanctum.sh"
                   value={form.email}
                   onChange={e => setForm(p => ({ ...p, email: e.target.value }))}
-                  className="w-full h-[44px] pl-[40px] pr-[14px] bg-bg border border-border rounded-[9px] text-[13px] text-text-h outline-none transition-colors focus:border-accent-border"
+                  onBlur={() => handleBlur("email")}
+                  className={`w-full h-[44px] pl-[40px] pr-[14px] bg-bg border rounded-[9px] text-[13px] text-text-h outline-none transition-colors ${
+                    touched.email && errors.email ? "border-danger" : "border-border focus:border-accent-border"
+                  }`}
                 />
               </div>
+              {touched.email && errors.email && <p className="text-[10px] text-danger mt-1 m-0">{errors.email}</p>}
             </div>
 
             {/* Password */}
@@ -116,7 +146,10 @@ export default function Login() {
                   placeholder="••••••••"
                   value={form.password}
                   onChange={e => setForm(p => ({ ...p, password: e.target.value }))}
-                  className="w-full h-[44px] pl-[40px] pr-[44px] bg-bg border border-border rounded-[9px] text-[13px] text-text-h outline-none transition-colors focus:border-accent-border"
+                  onBlur={() => handleBlur("password")}
+                  className={`w-full h-[44px] pl-[40px] pr-[44px] bg-bg border rounded-[9px] text-[13px] text-text-h outline-none transition-colors ${
+                    touched.password && errors.password ? "border-danger" : "border-border focus:border-accent-border"
+                  }`}
                 />
                 <button
                   type="button"
@@ -126,6 +159,19 @@ export default function Login() {
                   {showPassword ? <EyeOff size={14} strokeWidth={1.8} /> : <Eye size={14} strokeWidth={1.8} />}
                 </button>
               </div>
+              {touched.password && errors.password && <p className="text-[10px] text-danger mt-1 m-0">{errors.password}</p>}
+              {tab === "signup" && form.password.length > 0 && (
+                <div className="mt-2 flex flex-col gap-1">
+                  <div className="flex gap-1">
+                    {[0, 1, 2, 3, 4].map(i => (
+                      <div key={i} className={`flex-1 h-1 rounded-full transition-colors duration-300 ${
+                        i < passwordStrength.score ? passwordStrength.color : "bg-bg-hover"
+                      }`} />
+                    ))}
+                  </div>
+                  <span className="text-[9px] font-bold text-text opacity-60">{passwordStrength.label}</span>
+                </div>
+              )}
             </div>
 
             {/* Submit */}

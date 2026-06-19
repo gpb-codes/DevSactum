@@ -65,7 +65,7 @@ func ListCommunities(limit, offset int) ([]models.Community, error) {
 
 func JoinCommunity(communityID, userID uuid.UUID) error {
 	_, err := DB.Exec(`INSERT INTO community_members (id, community_id, user_id, role)
-					   VALUES (gen_random_uuid(), $1, $2, 'member') ON CONFLICT DO NOTHING`, communityID, userID)
+					   VALUES ($1, $2, $3, 'member') ON CONFLICT DO NOTHING`, uuid.New(), communityID, userID)
 	if err != nil {
 		return err
 	}
@@ -78,7 +78,7 @@ func LeaveCommunity(communityID, userID uuid.UUID) error {
 	if err != nil {
 		return err
 	}
-	_, err = DB.Exec("UPDATE communities SET member_count = GREATEST(member_count - 1, 0) WHERE id = $1", communityID)
+	_, err = DB.Exec("UPDATE communities SET member_count = MAX(member_count - 1, 0) WHERE id = $1", communityID)
 	return err
 }
 

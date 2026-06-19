@@ -1,13 +1,40 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import {
   Heart, MessageSquare, Share2, MoreHorizontal, Repeat2, Plus,
   Image, Code2, Link, Send, Smile, BookOpen, X,
 } from "lucide-react"
 import { useToast } from "@/components/ui/Toast"
+import { postService, type Post } from "@/services/posts"
 
-const POSTS = [
+interface FeedMilestone {
+  quote: string
+  stat: string
+  statLabel: string
+  statCaption: string
+}
+
+interface FeedPost {
+  id: number
+  initials: string
+  name: string
+  handle: string
+  time: string
+  text: string
+  code?: string
+  codeFile?: string
+  tags?: string[]
+  milestone?: FeedMilestone
+  likes: number
+  comments: number
+  shares: number
+  liked: boolean
+  avatarColor: string
+  avatarBg: string
+}
+
+const POSTS: FeedPost[] = [
   {
     id: 1, initials: "JD", name: "James Dalton", handle: "@jdalton_dev", time: "2h",
     text: "Optimizando el loop de hidratación para el nuevo reactive engine. Reducimos TTI un 40% usando un custom worker-thread scheduler. Miren la implementación core:",
@@ -18,7 +45,7 @@ const POSTS = [
   },
   {
     id: 2, initials: "ER", name: "Elena Rivera", handle: "@elena_codes", time: "5h",
-    text: "Terminé la UI hardware-acelerada para el nuevo emulador de terminal. El tonal layering y los luminescent pulses se sienten mucho mejor que los bordes estándar. 🎨",
+    text: "Terminé la UI hardware-acelerada para el nuevo emulador de terminal. El tonal layering y los luminescent pulses se sienten mucho mejor que los bordes estándar.",
     tags: ["Design System", "Rust", "WGPU"],
     likes: 452, comments: 29, shares: 8, liked: true,
     avatarColor: "#ff94a8", avatarBg: "rgba(255,148,168,.15)",
@@ -111,11 +138,48 @@ function Composer({ onPost }: { onPost: (text: string) => void }) {
 
 export default function Feed() {
   const { success } = useToast()
-  const [posts, setPosts]   = useState(POSTS)
+  const [posts, setPosts]   = useState<FeedPost[]>(POSTS)
+  const [loading, setLoading] = useState(false)
   const [likes, setLikes]   = useState<Record<number, { count: number; liked: boolean }>>(
     Object.fromEntries(POSTS.map(p => [p.id, { count: p.likes, liked: p.liked }]))
   )
   const [commenting, setCommenting] = useState<number | null>(null)
+
+  useEffect(() => {
+    loadPosts()
+  }, [])
+
+  async function loadPosts() {
+    setLoading(true)
+    try {
+      const apiPosts = await postService.getFeed(20, 0)
+      if (apiPosts.length > 0) {
+        const mapped: FeedPost[] = apiPosts.map(p => ({
+          id: parseInt(p.id) || Date.now(),
+          initials: p.authorInitials,
+          name: p.authorName,
+          handle: p.authorHandle,
+          time: p.createdAt,
+          text: p.content,
+          code: p.codeSnippet,
+          codeFile: p.codeLanguage,
+          tags: p.tags,
+          likes: p.likes,
+          comments: p.comments,
+          shares: p.shares,
+          liked: p.liked,
+          avatarColor: p.authorColor,
+          avatarBg: p.authorBg,
+        }))
+        setPosts(mapped)
+        setLikes(Object.fromEntries(mapped.map(p => [p.id, { count: p.likes, liked: p.liked }])))
+      }
+    } catch {
+      // Keep mock data as fallback
+    } finally {
+      setLoading(false)
+    }
+  }
   const [commentText, setCommentText] = useState("")
 
   function toggleLike(id: number) {
@@ -123,18 +187,42 @@ export default function Feed() {
       ...prev,
       [id]: { count: prev[id].liked ? prev[id].count - 1 : prev[id].count + 1, liked: !prev[id].liked },
     }))
+    postService.like(String(id)).catch(() => {})
   }
 
-  function handleNewPost(text: string) {
-    const newPost = {
-      id: Date.now(),
-      initials: "AV", name: "Alex Volkov", handle: "@alex_volkov", time: "ahora",
-      text, likes: 0, comments: 0, shares: 0, liked: false,
-      avatarColor: "#c49aff", avatarBg: "rgba(196,154,255,.15)",
+  async function handleNewPost(text: string) {
+    try {
+      const apiPost = await postService.create({ content: text })
+      const newPost: FeedPost = {
+        id: parseInt(apiPost.id) || Date.now(),
+        initials: apiPost.authorInitials,
+        name: apiPost.authorName,
+        handle: apiPost.authorHandle,
+        time: "ahora",
+        text: apiPost.content,
+        tags: apiPost.tags,
+        likes: 0,
+        comments: 0,
+        shares: 0,
+        liked: false,
+        avatarColor: apiPost.authorColor,
+        avatarBg: apiPost.authorBg,
+      }
+      setPosts(prev => [newPost, ...prev])
+      setLikes(prev => ({ ...prev, [newPost.id]: { count: 0, liked: false } }))
+      success("Post publicado", "Tu post es visible en el feed")
+    } catch {
+      // Fallback to local
+      const newPost: FeedPost = {
+        id: Date.now(),
+        initials: "AV", name: "Alex Volkov", handle: "@alex_volkov", time: "ahora",
+        text, likes: 0, comments: 0, shares: 0, liked: false,
+        avatarColor: "#c49aff", avatarBg: "rgba(196,154,255,.15)",
+      }
+      setPosts(prev => [newPost, ...prev])
+      setLikes(prev => ({ ...prev, [newPost.id]: { count: 0, liked: false } }))
+      success("Post publicado", "Tu post es visible en el feed")
     }
-    setPosts(prev => [newPost as any, ...prev])
-    setLikes(prev => ({ ...prev, [newPost.id]: { count: 0, liked: false } }))
-    success("Post publicado", "Tu post es visible en el feed")
   }
 
   function handleShare(id: number) {
@@ -206,7 +294,7 @@ export default function Feed() {
                   )}
 
                   {/* Code block */}
-                  {(post as any).code && (
+                  {post.code && (
                     <div className="rounded-[10px] overflow-hidden border border-border mb-3.5">
                       <div className="bg-bg-hover px-3.5 py-2 flex justify-between items-center border-b border-border">
                         <div className="flex items-center gap-2">
@@ -215,7 +303,7 @@ export default function Feed() {
                             <div className="w-2.5 h-2.5 rounded-full bg-[#ffbd2e]" />
                             <div className="w-2.5 h-2.5 rounded-full bg-[#28c840]" />
                           </div>
-                          <span className="text-[10px] font-mono text-text opacity-60">{(post as any).codeFile}</span>
+                          <span className="text-[10px] font-mono text-text opacity-60">{post.codeFile}</span>
                         </div>
                         <button
                           className="text-[10px] text-text opacity-50 bg-transparent border-none cursor-pointer hover:opacity-100 hover:text-accent transition-colors"
@@ -225,15 +313,15 @@ export default function Feed() {
                         </button>
                       </div>
                       <pre className="m-0 p-4 bg-black text-[12px] font-mono text-accent overflow-x-auto leading-[1.7]">
-                        <code>{(post as any).code}</code>
+                        <code>{post.code}</code>
                       </pre>
                     </div>
                   )}
 
                   {/* Tags */}
-                  {(post as any).tags && (
+                  {post.tags && (
                     <div className="flex gap-1.5 mb-3 flex-wrap">
-                      {(post as any).tags.map((tag: string) => (
+                      {post.tags.map((tag: string) => (
                         <span key={tag} className="bg-accent-bg text-accent border border-accent-border text-[10px] font-bold px-2.5 py-0.5 rounded-full">
                           {tag}
                         </span>
@@ -242,18 +330,18 @@ export default function Feed() {
                   )}
 
                   {/* Milestone */}
-                  {(post as any).milestone && (
+                  {post.milestone && (
                     <div className="grid grid-cols-2 gap-2.5 mb-3.5">
                       <div className="bg-bg-hover border border-border rounded-[10px] p-4 col-span-2">
                         <span className="text-[9px] font-bold text-accent uppercase tracking-[1.5px] block mb-1.5">Milestone</span>
-                        <p className="text-[13px] text-text-h italic leading-[1.5] m-0">&ldquo;{(post as any).milestone.quote}&rdquo;</p>
+                        <p className="text-[13px] text-text-h italic leading-[1.5] m-0">&ldquo;{post.milestone.quote}&rdquo;</p>
                       </div>
                       <div className="bg-bg-hover border border-border rounded-[10px] p-4">
                         <div className="flex items-baseline gap-1.5">
-                          <span className="text-[26px] font-black text-text-h tracking-tight">{(post as any).milestone.stat}</span>
-                          <span className="text-[11px] text-text">{(post as any).milestone.statLabel}</span>
+                          <span className="text-[26px] font-black text-text-h tracking-tight">{post.milestone.stat}</span>
+                          <span className="text-[11px] text-text">{post.milestone.statLabel}</span>
                         </div>
-                        <span className="text-[9px] font-bold text-text uppercase tracking-[1px] mt-1 block">{(post as any).milestone.statCaption}</span>
+                        <span className="text-[9px] font-bold text-text uppercase tracking-[1px] mt-1 block">{post.milestone.statCaption}</span>
                       </div>
                     </div>
                   )}
