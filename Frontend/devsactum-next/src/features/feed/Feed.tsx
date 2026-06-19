@@ -127,9 +127,9 @@ function Composer({ onPost }: { onPost: (text: string) => void }) {
 }
 
 function PostCard({ post, likes, onLike, onShare, onCommenting, commenting, commentText, setCommentText, idx }: {
-  post: { author: { initials: string; name: string; handle: string; avatarColor: string; avatarBg: string }; content: string; image?: string; timestamp: string; comments: number; reposts: number; premium?: boolean }
-  likes: number; onLike: () => void; onShare: () => void; onCommenting: () => void
-  commenting: boolean; commentText: string; setCommentText: (v: string) => void; idx: number
+  post: FeedPost
+  likes: Record<number, { count: number; liked: boolean }>; onLike: (id: number) => void; onShare: (id: number) => void; onCommenting: (id: number | null) => void
+  commenting: number | null; commentText: string; setCommentText: (v: string) => void; idx: number
 }) {
   const { success } = useToast()
   const [heartPulse, setHeartPulse] = useState(false)

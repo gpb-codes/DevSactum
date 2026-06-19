@@ -22,12 +22,12 @@ const TwitterIcon = () => (
 
 type Section = "perfil" | "cuenta" | "privacidad" | "notificaciones" | "apariencia" | "integraciones"
 
-function ToggleRow({
+function ToggleRow<T extends Record<string, boolean>>({
   label, description, stateKey, state, setState,
 }: {
-  label: string; description: string; stateKey: string
-  state: Record<string, boolean>
-  setState: React.Dispatch<React.SetStateAction<Record<string, boolean>>>
+  label: string; description: string; stateKey: keyof T
+  state: T
+  setState: React.Dispatch<React.SetStateAction<T>>
 }) {
   return (
     <div className="flex items-center justify-between py-4 border-b border-[var(--border)] last:border-0">
@@ -37,7 +37,7 @@ function ToggleRow({
       </div>
       <Toggle
         enabled={state[stateKey]}
-        onChange={() => setState((p: Record<string, boolean>) => ({ ...p, [stateKey]: !p[stateKey] }))}
+        onChange={() => setState((p) => ({ ...p, [stateKey]: !p[stateKey] }))}
       />
     </div>
   )
