@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
   "name": "devsactum-next",
   "version": "0.1.0",
   "private": true,
@@ -25,5 +26,36 @@
     "eslint-config-next": "16.2.2",
     "tailwindcss": "^4",
     "typescript": "^5"
+=======
+  "name": "devsanctum-next",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "lucide-react": "^0.513.0",
+    "next": "15.3.3",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@eslint/compat": "^2.1.0",
+    "@tailwindcss/postcss": "^4.1.5",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@types/node": "^22.15.3",
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.2",
+    "eslint": "^9.25.1",
+    "eslint-config-next": "^15.3.3",
+    "jsdom": "^29.1.1",
+    "tailwindcss": "^4.1.5",
+    "typescript": "^5.8.3",
+    "vitest": "^4.1.9"
+>>>>>>> 394430d1d88efd992cfcdfe22615c5b18f2056ab
   }
 }

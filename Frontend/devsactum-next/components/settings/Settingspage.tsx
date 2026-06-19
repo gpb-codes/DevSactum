@@ -6,6 +6,7 @@ import {
   Eye, EyeOff, Moon, Sun, Monitor, Check,
   Link2, Trash2, LogOut,
 } from "lucide-react"
+import { ThemeCustomizer } from "@/components/ui/ThemeCustomizer"
 
 /* Íconos de marca — lucide-react v1+ los eliminó, usamos SVG inline */
 const GithubIcon = () => (
@@ -109,6 +110,7 @@ export default function SettingsPage() {
   }: {
     label: string; description: string; stateKey: string
     state: Record<string, boolean>
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setState: React.Dispatch<React.SetStateAction<any>>
   }) {
     return (
@@ -118,8 +120,8 @@ export default function SettingsPage() {
           <div className="text-[11px] text-text mt-0.5 opacity-70">{description}</div>
         </div>
         <Toggle
-          enabled={state[stateKey]}
-          onChange={() => setState((p: any) => ({ ...p, [stateKey]: !p[stateKey] }))}
+          enabled={!!state[stateKey]}
+          onChange={() => setState((p: Record<string, boolean>) => ({ ...p, [stateKey]: !p[stateKey] }))}
         />
       </div>
     )
@@ -138,10 +140,10 @@ export default function SettingsPage() {
         <p className="text-[13px] text-text mt-1 m-0">Administra tu cuenta, privacidad y preferencias.</p>
       </div>
 
-      <div className="flex gap-6 items-start">
+      <div className="flex flex-col lg:flex-row gap-6 items-start">
 
         {/* ── Sidebar ── */}
-        <aside className="w-[200px] shrink-0 sticky top-20">
+        <aside className="w-full lg:w-[200px] shrink-0 lg:sticky lg:top-20">
           <nav className="flex flex-col gap-0.5">
             {SECTIONS.map(({ id, label: lbl, Icon }) => (
               <button
@@ -333,86 +335,9 @@ export default function SettingsPage() {
             {/* APARIENCIA */}
             {activeSection === "apariencia" && (
               <div className="p-6">
-                <h2 className="text-[15px] font-extrabold text-text-h mb-5 m-0">Apariencia</h2>
-
-                {/* Tema */}
-                <div className="mb-6 pb-6 border-b border-border">
-                  <div className="text-[10px] font-extrabold uppercase tracking-[1.5px] text-text opacity-50 mb-3">Tema</div>
-                  <div className="grid grid-cols-3 gap-2.5">
-                    {([
-                      { id: "dark",   label: "Oscuro",  Icon: Moon    },
-                      { id: "light",  label: "Claro",   Icon: Sun     },
-                      { id: "system", label: "Sistema", Icon: Monitor },
-                    ] as const).map(({ id, label: lbl, Icon }) => (
-                      <button
-                        key={id}
-                        onClick={() => setTheme(id)}
-                        className={`flex flex-col items-center gap-2 py-4 rounded-[10px] border cursor-pointer transition-all duration-150 ${
-                          theme === id
-                            ? "bg-accent-bg border-accent text-accent"
-                            : "bg-bg border-border text-text hover:border-accent-border"
-                        }`}
-                      >
-                        <Icon size={18} strokeWidth={1.8} />
-                        <span className="text-[11px] font-bold">{lbl}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Acento */}
-                <div className="mb-6 pb-6 border-b border-border">
-                  <div className="text-[10px] font-extrabold uppercase tracking-[1.5px] text-text opacity-50 mb-3">Color de acento</div>
-                  <div className="flex gap-3 flex-wrap">
-                    {["#c49aff", "#60a5fa", "#4ade80", "#fb923c", "#f472b6", "#facc15"].map(color => (
-                      <button
-                        key={color}
-                        onClick={() => setAccentColor(color)}
-                        className="w-8 h-8 rounded-full cursor-pointer flex items-center justify-center transition-transform duration-150 hover:scale-110 border-2"
-                        style={{
-                          background: color,
-                          borderColor: accentColor === color ? color : "transparent",
-                          boxShadow: accentColor === color ? `0 0 0 2px var(--color-bg), 0 0 0 4px ${color}` : "none",
-                        }}
-                      >
-                        {accentColor === color && <Check size={12} className="text-[#1a0033]" strokeWidth={3} />}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Tamaño fuente */}
-                <div className="mb-6 pb-6 border-b border-border">
-                  <div className="text-[10px] font-extrabold uppercase tracking-[1.5px] text-text opacity-50 mb-3">Tamaño de texto</div>
-                  <div className="flex gap-2">
-                    {([
-                      { id: "sm", label: "Pequeño" },
-                      { id: "md", label: "Normal"  },
-                      { id: "lg", label: "Grande"  },
-                    ] as const).map(({ id, label: lbl }) => (
-                      <button
-                        key={id}
-                        onClick={() => setFontSize(id)}
-                        className={`flex-1 py-2 rounded-[8px] border text-[12px] font-bold cursor-pointer transition-all duration-150 ${
-                          fontSize === id
-                            ? "bg-accent-bg text-accent border-accent-border"
-                            : "bg-bg text-text border-border hover:border-accent-border"
-                        }`}
-                      >
-                        {lbl}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Reducir movimiento */}
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="text-[13px] font-semibold text-text-h">Reducir movimiento</div>
-                    <div className="text-[11px] text-text opacity-70 mt-0.5">Minimiza las animaciones de la interfaz.</div>
-                  </div>
-                  <Toggle enabled={reducedMotion} onChange={() => setReducedMotion(!reducedMotion)} />
-                </div>
+                <h2 className="text-[15px] font-extrabold text-text-h mb-1 m-0">Apariencia</h2>
+                <p className="text-[12px] text-text opacity-70 mb-6">Personaliza el tema, colores y comportamiento de la interfaz.</p>
+                <ThemeCustomizer />
               </div>
             )}
 

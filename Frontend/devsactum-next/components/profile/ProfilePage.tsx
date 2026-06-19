@@ -1,8 +1,10 @@
 "use client"
 
 import React, { useState } from "react"
-import { ExternalLink, Terminal, Shield, Database, MessageSquare, Heart, UserPlus, Mail, Star, GitFork } from "lucide-react"
+import { ExternalLink, Terminal, Shield, Database, MessageSquare, Heart, UserPlus, Mail, Star, GitFork, Lock, Eye, EyeOff } from "lucide-react"
 import { useNav } from "@/context/NavContext"
+import { useJobAuth } from "@/context/JobAuthContext"
+import { PremiumGate, PremiumBadge } from "@/components/ui/PremiumGate"
 
 const REPOS = [
   { name: "lumina-engine",  desc: "High-performance async runtime for WebAssembly modules in edge environments.", lang: "Rust", langColor: "#f97316", stars: "12.4k", forks: "892",  Icon: Terminal, wide: false },
@@ -25,14 +27,17 @@ const HEATMAP = [0, 20, 40, 0, 60, 10, 100, 0, 0, 30, 50, 20, 0, 10, 40, 80, 20,
 
 export default function ProfilePage() {
   const { setActivePage } = useNav()
+  const { user } = useJobAuth()
   const [following, setFollowing] = useState(false)
+  const [showContact, setShowContact] = useState(false)
+
+  const isPremium = user?.isPremium ?? false
 
   return (
     <div className="px-6 py-6 max-w-[1100px] mx-auto">
 
       {/* Hero banner */}
       <header className="bg-bg-surface border border-border rounded-[14px] overflow-hidden mb-6 relative min-h-[320px]">
-        {/* Banner */}
         <div className="h-[180px] relative" style={{ background: "linear-gradient(135deg, #1a0a3a, #2a0060, #0a1a4a)" }}>
           <svg className="absolute inset-0 w-full h-full opacity-30" viewBox="0 0 800 180" fill="none">
             <path d="M0 90 Q200 20 400 90 Q600 160 800 90" stroke="#c49aff" strokeWidth="1" opacity=".6"/>
@@ -43,14 +48,16 @@ export default function ProfilePage() {
           </svg>
         </div>
 
-        {/* Avatar + info */}
         <div className="px-7 pb-7 relative">
           <div className="flex items-end gap-5 -mt-14">
             <div className="w-[100px] h-[100px] rounded-[14px] bg-accent-bg border-[3px] border-bg-surface flex items-center justify-center text-[32px] font-black text-accent shrink-0">
               AV
             </div>
             <div className="pb-1">
-              <h1 className="text-[28px] font-black tracking-[-1px] text-text-h m-0 mb-1">Alex Volkov</h1>
+              <div className="flex items-center gap-2 mb-1">
+                <h1 className="text-[28px] font-black tracking-[-1px] text-text-h m-0">Alex Volkov</h1>
+                {!isPremium && <PremiumBadge />}
+              </div>
               <p className="text-[12px] text-accent font-bold m-0">Principal Distributed Systems Architect</p>
             </div>
             <div className="ml-auto flex gap-2 pb-1">
@@ -86,10 +93,47 @@ export default function ProfilePage() {
       </header>
 
       {/* Grid principal */}
-      <div className="grid grid-cols-[1fr_320px] gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-5">
 
         {/* Columna izquierda */}
         <div className="flex flex-col gap-5">
+
+          {/* Info personal - PREMIUM GATE */}
+          <PremiumGate featureName="Información de contacto" showBlur={true}>
+            <div className="bg-bg-surface border border-border rounded-[14px] p-5">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-[13px] font-extrabold uppercase tracking-[1.5px] text-text-h m-0 flex items-center gap-2">
+                  Información Personal
+                  {!isPremium && <Lock size={12} className="text-accent" strokeWidth={2} />}
+                </h2>
+                <button
+                  onClick={() => setShowContact(!showContact)}
+                  className="flex items-center gap-1 bg-transparent border-none text-accent text-[11px] font-bold cursor-pointer"
+                >
+                  {showContact ? <EyeOff size={11} strokeWidth={2} /> : <Eye size={11} strokeWidth={2} />}
+                  {showContact ? "Ocultar" : "Mostrar"}
+                </button>
+              </div>
+              <div className={`flex flex-col gap-3 ${!showContact && !isPremium ? "blur-[4px] select-none" : ""}`}>
+                <div className="flex items-center gap-3">
+                  <Mail size={14} className="text-text opacity-50" strokeWidth={1.8} />
+                  <span className="text-[13px] text-text-h">alex.volkov@devsanctum.io</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <ExternalLink size={14} className="text-text opacity-50" strokeWidth={1.8} />
+                  <span className="text-[13px] text-accent">alexvolkov.dev</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Terminal size={14} className="text-text opacity-50" strokeWidth={1.8} />
+                  <span className="text-[13px] text-text-h font-mono">github.com/alexvolkov</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Shield size={14} className="text-text opacity-50" strokeWidth={1.8} />
+                  <span className="text-[13px] text-text-h">San Francisco, CA (UTC-8)</span>
+                </div>
+              </div>
+            </div>
+          </PremiumGate>
 
           {/* Repositorios */}
           <section className="bg-bg-surface border border-border rounded-[14px] p-5">
@@ -101,10 +145,7 @@ export default function ProfilePage() {
             </div>
             <div className="grid grid-cols-2 gap-2.5">
               {REPOS.map((r) => (
-                <div
-                  key={r.name}
-                  className={`bg-bg-hover border border-border rounded-[10px] p-4 cursor-pointer transition-colors duration-150 hover:border-accent-border ${r.wide ? "col-span-2" : "col-span-1"}`}
-                >
+                <div key={r.name} className={`bg-bg-hover border border-border rounded-[10px] p-4 cursor-pointer transition-colors duration-150 hover:border-accent-border ${r.wide ? "col-span-2" : "col-span-1"}`}>
                   <div className="flex justify-between mb-2.5">
                     <r.Icon size={22} className="text-accent" strokeWidth={1.6} />
                     <span className="text-[9px] font-bold uppercase tracking-[1px] text-text">Public</span>
@@ -160,6 +201,27 @@ export default function ProfilePage() {
             </div>
           </div>
 
+          {/* Contacto rápido - PREMIUM */}
+          <PremiumGate featureName="Contacto directo" showBlur={true}>
+            <div className="bg-bg-surface border border-border rounded-[14px] p-5">
+              <div className="text-[10px] font-extrabold uppercase tracking-[1.5px] text-text mb-3 flex items-center gap-2">
+                Contacto Directo
+                {!isPremium && <Lock size={10} className="text-accent" strokeWidth={2.5} />}
+              </div>
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-2 text-[12px] text-text-h">
+                  <Mail size={12} strokeWidth={2} /> alex.volkov@devsanctum.io
+                </div>
+                <div className="flex items-center gap-2 text-[12px] text-text-h">
+                  <ExternalLink size={12} strokeWidth={2} /> alexvolkov.dev
+                </div>
+                <div className="flex items-center gap-2 text-[12px] text-text-h">
+                  <Terminal size={12} strokeWidth={2} /> github.com/alexvolkov
+                </div>
+              </div>
+            </div>
+          </PremiumGate>
+
           {/* Trust score */}
           <div className="bg-bg-surface border border-border rounded-[14px] p-5 text-center">
             <div className="text-[10px] font-extrabold uppercase tracking-[1.5px] text-text mb-4">Network Reputation</div>
@@ -183,11 +245,7 @@ export default function ProfilePage() {
             <div className="text-[10px] font-extrabold uppercase tracking-[1.5px] text-text mb-3">Global Activity</div>
             <div className="grid grid-cols-7 gap-[3px]">
               {HEATMAP.map((v, i) => (
-                <div
-                  key={i}
-                  className="aspect-square rounded-[3px]"
-                  style={{ background: v === 0 ? "var(--color-bg-hover)" : `rgba(196,154,255,${v / 100})` }}
-                />
+                <div key={i} className="aspect-square rounded-[3px]" style={{ background: v === 0 ? "var(--color-bg-hover)" : `rgba(196,154,255,${v / 100})` }} />
               ))}
             </div>
             <p className="text-[10px] text-text font-mono mt-2.5">1,402 contributions in the last year</p>

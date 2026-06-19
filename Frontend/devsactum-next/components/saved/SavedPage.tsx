@@ -74,7 +74,7 @@ export default function SavedPage() {
     success("Eliminado de guardados")
   }
 
-  const FILTERS = [
+  const FILTERS: { id: "all" | SavedItem["type"]; label: string; count: number }[] = [
     { id: "all",       label: "Todo",          count: items.length },
     { id: "post",      label: "Posts",         count: items.filter(i => i.type === "post").length },
     { id: "article",   label: "Artículos",     count: items.filter(i => i.type === "article").length },
@@ -111,7 +111,7 @@ export default function SavedPage() {
         {FILTERS.map(f => (
           <button
             key={f.id}
-            onClick={() => setFilter(f.id as any)}
+            onClick={() => setFilter(f.id)}
             className={`shrink-0 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[11px] font-bold cursor-pointer border transition-all duration-150 ${
               filter === f.id
                 ? "bg-accent text-[#1a0033] border-accent"

@@ -1,0 +1,207 @@
+
+> devsactum-nestjs-api@0.1.0 start:dev
+> nest start --watch
+
+[2J[3J[H[[90m6:40:07 p. m.[0m] Starting compilation in watch mode...
+
+[96msrc/auth/jwt.strategy.ts[0m:[93m17[0m:[93m42[0m - [91merror[0m[90m TS2339: [0mProperty 'findOne' does not exist on type 'UsersService'.
+
+[7m17[0m     const user = await this.usersService.findOne(payload.sub)
+[7m  [0m [91m                                         ~~~~~~~[0m
+
+[96msrc/posts/posts.controller.ts[0m:[93m13[0m:[93m60[0m - [91merror[0m[90m TS2353: [0mObject literal may only specify known properties, and 'authorId' does not exist in type 'Partial<Post>'.
+
+[7m13[0m     const post = await this.postsService.create({ ...data, authorId: req.user.id });
+[7m  [0m [91m                                                           ~~~~~~~~[0m
+
+[96msrc/reputation/profile.entity.ts[0m:[93m55[0m:[93m4[0m - [91merror[0m[90m TS2304: [0mCannot find name 'ManyToOne'.
+
+[7m55[0m   @ManyToOne(() => User, user => user.id)
+[7m  [0m [91m   ~~~~~~~~~[0m
+
+[[90m6:40:52 p. m.[0m] Found 3 errors. Watching for file changes.
+
+[2J[3J[H[[90m6:42:48 p. m.[0m] File change detected. Starting incremental compilation...
+
+[96msrc/posts/posts.controller.ts[0m:[93m13[0m:[93m60[0m - [91merror[0m[90m TS2353: [0mObject literal may only specify known properties, and 'authorId' does not exist in type 'Partial<Post>'.
+
+[7m13[0m     const post = await this.postsService.create({ ...data, authorId: req.user.id });
+[7m  [0m [91m                                                           ~~~~~~~~[0m
+
+[96msrc/reputation/profile.entity.ts[0m:[93m55[0m:[93m4[0m - [91merror[0m[90m TS2304: [0mCannot find name 'ManyToOne'.
+
+[7m55[0m   @ManyToOne(() => User, user => user.id)
+[7m  [0m [91m   ~~~~~~~~~[0m
+
+[[90m6:42:49 p. m.[0m] Found 2 errors. Watching for file changes.
+
+[2J[3J[H[[90m6:43:36 p. m.[0m] File change detected. Starting incremental compilation...
+
+[96msrc/reputation/profile.entity.ts[0m:[93m55[0m:[93m4[0m - [91merror[0m[90m TS2304: [0mCannot find name 'ManyToOne'.
+
+[7m55[0m   @ManyToOne(() => User, user => user.id)
+[7m  [0m [91m   ~~~~~~~~~[0m
+
+[[90m6:43:36 p. m.[0m] Found 1 error. Watching for file changes.
+
+[2J[3J[H[[90m6:44:12 p. m.[0m] File change detected. Starting incremental compilation...
+
+[[90m6:44:14 p. m.[0m] Found 0 errors. Watching for file changes.
+
+(node:6404) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+[32m[Nest] 18116  - [39m18-06-2026, 6:45:05 p. m. [32m    LOG[39m [38;5;3m[NestFactory] [39m[32mStarting Nest application...[39m
+[32m[Nest] 18116  - [39m18-06-2026, 6:45:06 p. m. [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAppModule dependencies initialized[39m[38;5;3m +1094ms[39m
+[32m[Nest] 18116  - [39m18-06-2026, 6:45:06 p. m. [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mTypeOrmModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 18116  - [39m18-06-2026, 6:45:06 p. m. [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mPassportModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 18116  - [39m18-06-2026, 6:45:06 p. m. [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mJwtModule dependencies initialized[39m[38;5;3m +0ms[39m
+[31m[Nest] 18116  - [39m18-06-2026, 6:45:06 p. m. [31m  ERROR[39m [38;5;3m[TypeOrmModule] [39m[31mUnable to connect to the database. Retrying (1)...[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+[31m[Nest] 18116  - [39m18-06-2026, 6:45:09 p. m. [31m  ERROR[39m [38;5;3m[TypeOrmModule] [39m[31mUnable to connect to the database. Retrying (2)...[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+[31m[Nest] 18116  - [39m18-06-2026, 6:45:12 p. m. [31m  ERROR[39m [38;5;3m[TypeOrmModule] [39m[31mUnable to connect to the database. Retrying (3)...[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+[31m[Nest] 18116  - [39m18-06-2026, 6:45:15 p. m. [31m  ERROR[39m [38;5;3m[TypeOrmModule] [39m[31mUnable to connect to the database. Retrying (4)...[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+[31m[Nest] 18116  - [39m18-06-2026, 6:45:18 p. m. [31m  ERROR[39m [38;5;3m[TypeOrmModule] [39m[31mUnable to connect to the database. Retrying (5)...[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+[31m[Nest] 18116  - [39m18-06-2026, 6:45:21 p. m. [31m  ERROR[39m [38;5;3m[TypeOrmModule] [39m[31mUnable to connect to the database. Retrying (6)...[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+[31m[Nest] 18116  - [39m18-06-2026, 6:45:24 p. m. [31m  ERROR[39m [38;5;3m[TypeOrmModule] [39m[31mUnable to connect to the database. Retrying (7)...[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+[31m[Nest] 18116  - [39m18-06-2026, 6:45:27 p. m. [31m  ERROR[39m [38;5;3m[TypeOrmModule] [39m[31mUnable to connect to the database. Retrying (8)...[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+[31m[Nest] 18116  - [39m18-06-2026, 6:45:30 p. m. [31m  ERROR[39m [38;5;3m[TypeOrmModule] [39m[31mUnable to connect to the database. Retrying (9)...[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+[31m[Nest] 18116  - [39m18-06-2026, 6:45:30 p. m. [31m  ERROR[39m [38;5;3m[ExceptionHandler] [39m[31m[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+[2J[3J[H[[90m6:51:31 p. m.[0m] File change detected. Starting incremental compilation...
+
+[[90m6:51:32 p. m.[0m] Found 0 errors. Watching for file changes.
+
+[32m[Nest] 16728  - [39m18-06-2026, 6:51:34 p. m. [32m    LOG[39m [38;5;3m[NestFactory] [39m[32mStarting Nest application...[39m
+[32m[Nest] 16728  - [39m18-06-2026, 6:51:34 p. m. [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAppModule dependencies initialized[39m[38;5;3m +115ms[39m
+[32m[Nest] 16728  - [39m18-06-2026, 6:51:34 p. m. [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mTypeOrmModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 16728  - [39m18-06-2026, 6:51:34 p. m. [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mPassportModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 16728  - [39m18-06-2026, 6:51:34 p. m. [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mJwtModule dependencies initialized[39m[38;5;3m +0ms[39m
+[31m[Nest] 16728  - [39m18-06-2026, 6:51:34 p. m. [31m  ERROR[39m [38;5;3m[TypeOrmModule] [39m[31mUnable to connect to the database. Retrying (1)...[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+[31m[Nest] 16728  - [39m18-06-2026, 6:51:37 p. m. [31m  ERROR[39m [38;5;3m[TypeOrmModule] [39m[31mUnable to connect to the database. Retrying (2)...[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+[31m[Nest] 16728  - [39m18-06-2026, 6:51:40 p. m. [31m  ERROR[39m [38;5;3m[TypeOrmModule] [39m[31mUnable to connect to the database. Retrying (3)...[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+[31m[Nest] 16728  - [39m18-06-2026, 6:51:43 p. m. [31m  ERROR[39m [38;5;3m[TypeOrmModule] [39m[31mUnable to connect to the database. Retrying (4)...[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+[31m[Nest] 16728  - [39m18-06-2026, 6:51:46 p. m. [31m  ERROR[39m [38;5;3m[TypeOrmModule] [39m[31mUnable to connect to the database. Retrying (5)...[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+[31m[Nest] 16728  - [39m18-06-2026, 6:51:49 p. m. [31m  ERROR[39m [38;5;3m[TypeOrmModule] [39m[31mUnable to connect to the database. Retrying (6)...[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+[31m[Nest] 16728  - [39m18-06-2026, 6:51:52 p. m. [31m  ERROR[39m [38;5;3m[TypeOrmModule] [39m[31mUnable to connect to the database. Retrying (7)...[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+[31m[Nest] 16728  - [39m18-06-2026, 6:51:55 p. m. [31m  ERROR[39m [38;5;3m[TypeOrmModule] [39m[31mUnable to connect to the database. Retrying (8)...[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+[31m[Nest] 16728  - [39m18-06-2026, 6:51:58 p. m. [31m  ERROR[39m [38;5;3m[TypeOrmModule] [39m[31mUnable to connect to the database. Retrying (9)...[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+[31m[Nest] 16728  - [39m18-06-2026, 6:51:58 p. m. [31m  ERROR[39m [38;5;3m[ExceptionHandler] [39m[31m[39m
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)
+[2J[3J[H[[90m6:52:23 p. m.[0m] File change detected. Starting incremental compilation...
+
+[[90m6:52:24 p. m.[0m] Found 0 errors. Watching for file changes.
+
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[NestFactory] [39m[32mStarting Nest application...[39m
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAppModule dependencies initialized[39m[38;5;3m +510ms[39m
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mTypeOrmModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mPassportModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mJwtModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mTypeOrmCoreModule dependencies initialized[39m[38;5;3m +226ms[39m
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mTypeOrmModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mTypeOrmModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mTypeOrmModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mTypeOrmModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mTypeOrmModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mUsersModule dependencies initialized[39m[38;5;3m +4ms[39m
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mReputationModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAuthModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mPostsModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mCommunitiesModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mMessagesModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mUsersController {/api/v1/users}:[39m[38;5;3m +11ms[39m
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/users, POST} route[39m[38;5;3m +5ms[39m
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/users/:id, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/users/:id, PUT} route[39m[38;5;3m +2ms[39m
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/users/:id, DELETE} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mPostsController {/api/v1/posts}:[39m[38;5;3m +1ms[39m
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/posts, POST} route[39m[38;5;3m +2ms[39m
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/posts, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/posts/user/:userId, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/posts/tag/:tag, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/posts/:id, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/posts/:id/like, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/posts/:id, DELETE} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mCommunitiesController {/api/v1/communities}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/communities, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/communities, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/communities/:id, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/communities/:id/join, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/communities/:id/leave, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/communities/:id, DELETE} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mMessagesController {/api/v1/messages}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/messages, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/messages/direct/:userId1/:userId2, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/messages/community/:communityId, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/messages/unread/:userId, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/messages/:id/read, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mReputationController {/api/v1/reputation}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/reputation/user/:userId, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/reputation/user/:userId/history, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/reputation/leaderboard, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/reputation/event, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mAuthController {/api/v1/auth}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/auth/login, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/auth/register, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 19880  - [39m18-06-2026, 6:52:27 p. m. [32m    LOG[39m [38;5;3m[NestApplication] [39m[32mNest application successfully started[39m[38;5;3m +8ms[39m
+NestJS API running on port 8001
+[2J[3J[H[[90m7:01:30 p. m.[0m] File change detected. Starting incremental compilation...
+
+[2J[3J[H[[90m8:35:19 p. m.[0m] File change detected. Starting incremental compilation...
+

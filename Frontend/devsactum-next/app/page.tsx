@@ -1,5 +1,10 @@
-import { AppShell } from "@/src/components/layout/AppShell"
+import AppShell from "@/components/layout/AppShell"
+import { NavProvider } from "@/context/NavContext"
 
 export default function RootPage() {
-  return <AppShell />
+  return (
+    <NavProvider>
+      <AppShell />
+    </NavProvider>
+  )
 }

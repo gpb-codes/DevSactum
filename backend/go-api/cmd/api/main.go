@@ -6,8 +6,10 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/gpb-codes/DevSactum/backend/go-api/internal/handlers"
+	"github.com/gpb-codes/DevSactum/backend/go-api/internal/middleware"
 	"github.com/gpb-codes/DevSactum/backend/go-api/internal/repository"
 	"github.com/gpb-codes/DevSactum/backend/go-api/internal/services"
+	ws "github.com/gpb-codes/DevSactum/backend/go-api/internal/websocket"
 )
 
 func main() {
@@ -21,12 +23,14 @@ func main() {
 	communityService := services.NewCommunityService()
 	messageService := services.NewMessageService()
 	reputationService := services.NewReputationService()
+	jobService := services.NewJobService()
 
 	authHandler := handlers.NewAuthHandler(authService)
 	postHandler := handlers.NewPostHandler(postService)
 	communityHandler := handlers.NewCommunityHandler(communityService)
 	messageHandler := handlers.NewMessageHandler(messageService)
 	reputationHandler := handlers.NewReputationHandler(reputationService)
+	jobHandler := handlers.NewJobHandler(jobService)
 
 	r := gin.Default()
 
@@ -51,36 +55,36 @@ func main() {
 		{
 			auth.POST("/register", authHandler.Register)
 			auth.POST("/login", authHandler.Login)
-			auth.GET("/user/:id", authHandler.GetProfile)
-			auth.PUT("/user/:id", authHandler.UpdateProfile)
+			auth.GET("/user/:id", middleware.OptionalAuthMiddleware(), authHandler.GetProfile)
+			auth.PUT("/user/:id", middleware.AuthMiddleware(), authHandler.UpdateProfile)
 		}
 
 		posts := api.Group("/posts")
 		{
-			posts.GET("", postHandler.GetFeed)
-			posts.GET("/:id", postHandler.GetPost)
-			posts.POST("", postHandler.CreatePost)
-			posts.POST("/:id/like", postHandler.LikePost)
-			posts.DELETE("/:id", postHandler.DeletePost)
-			posts.GET("/user/:user_id", postHandler.GetUserPosts)
-			posts.GET("/tag/:tag", postHandler.GetPostsByTag)
+			posts.GET("", middleware.OptionalAuthMiddleware(), postHandler.GetFeed)
+			posts.GET("/:id", middleware.OptionalAuthMiddleware(), postHandler.GetPost)
+			posts.POST("", middleware.AuthMiddleware(), postHandler.CreatePost)
+			posts.POST("/:id/like", middleware.AuthMiddleware(), postHandler.LikePost)
+			posts.DELETE("/:id", middleware.AuthMiddleware(), postHandler.DeletePost)
+			posts.GET("/user/:user_id", middleware.OptionalAuthMiddleware(), postHandler.GetUserPosts)
+			posts.GET("/tag/:tag", middleware.OptionalAuthMiddleware(), postHandler.GetPostsByTag)
 		}
 
 		communities := api.Group("/communities")
 		{
 			communities.GET("", communityHandler.ListCommunities)
 			communities.GET("/:id", communityHandler.GetCommunity)
-			communities.POST("", communityHandler.CreateCommunity)
-			communities.POST("/:id/join", communityHandler.JoinCommunity)
-			communities.POST("/:id/leave", communityHandler.LeaveCommunity)
+			communities.POST("", middleware.AuthMiddleware(), communityHandler.CreateCommunity)
+			communities.POST("/:id/join", middleware.AuthMiddleware(), communityHandler.JoinCommunity)
+			communities.POST("/:id/leave", middleware.AuthMiddleware(), communityHandler.LeaveCommunity)
 		}
 
 		messages := api.Group("/messages")
 		{
-			messages.POST("", messageHandler.SendMessage)
-			messages.GET("/direct/:user_id_1/:user_id_2", messageHandler.GetDirectMessages)
+			messages.POST("", middleware.AuthMiddleware(), messageHandler.SendMessage)
+			messages.GET("/direct/:user_id_1/:user_id_2", middleware.AuthMiddleware(), messageHandler.GetDirectMessages)
 			messages.GET("/community/:community_id", messageHandler.GetCommunityMessages)
-			messages.GET("/unread", messageHandler.GetUnreadCount)
+			messages.GET("/unread", middleware.AuthMiddleware(), messageHandler.GetUnreadCount)
 		}
 
 		reputation := api.Group("/reputation")
@@ -89,7 +93,27 @@ func main() {
 			reputation.GET("/user/:user_id/history", reputationHandler.GetReputationHistory)
 			reputation.GET("/leaderboard", reputationHandler.GetLeaderboard)
 		}
+
+		jobs := api.Group("/jobs")
+		{
+			jobs.GET("", jobHandler.GetJobs)
+			jobs.GET("/:id", jobHandler.GetJob)
+			jobs.POST("", middleware.AuthMiddleware(), jobHandler.CreateJob)
+			jobs.PATCH("/:id", middleware.AuthMiddleware(), jobHandler.UpdateJob)
+			jobs.DELETE("/:id", middleware.AuthMiddleware(), jobHandler.DeleteJob)
+			jobs.POST("/:id/apply", middleware.AuthMiddleware(), jobHandler.ApplyToJob)
+			jobs.GET("/:id/applications", middleware.AuthMiddleware(), jobHandler.GetJobApplications)
+			jobs.PATCH("/applications/:applicationId", middleware.AuthMiddleware(), jobHandler.UpdateApplicationStatus)
+		}
+
+		company := api.Group("/company")
+		{
+			company.GET("/dashboard", middleware.AuthMiddleware(), jobHandler.GetCompanyDashboard)
+			company.GET("/jobs", middleware.AuthMiddleware(), jobHandler.GetCompanyJobs)
+		}
 	}
+
+	ws.RegisterRoutes(r)
 
 	port := os.Getenv("PORT")
 	if port == "" {

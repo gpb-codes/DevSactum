@@ -48,7 +48,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	token, _ := h.AuthService.GenerateToken(user.ID)
+	token, _ := h.AuthService.GenerateToken(user.ID, user.Email)
 
 	c.JSON(http.StatusOK, gin.H{
 		"user":  user,
@@ -78,6 +78,18 @@ func (h *AuthHandler) UpdateProfile(c *gin.Context) {
 	id, err := uuid.Parse(idStr)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid user id"})
+		return
+	}
+
+	authUserIDStr := c.GetString("user_id")
+	authUserID, err := uuid.Parse(authUserIDStr)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+
+	if authUserID != id {
+		c.JSON(http.StatusForbidden, gin.H{"error": "you can only update your own profile"})
 		return
 	}
 

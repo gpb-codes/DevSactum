@@ -1,0 +1,45 @@
+2026/06/18 18:56:57 Trying SQLite fallback...
+2026/06/18 18:56:57 Warning: could not create tables: Binary was compiled with 'CGO_ENABLED=0', go-sqlite3 requires cgo to work. This is a stub
+2026/06/18 18:56:57 Connected to SQLite: devsactum.db
+[GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
+
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] GET    /health                   --> main.main.func2 (4 handlers)
+[GIN-debug] POST   /api/v1/auth/register     --> github.com/gpb-codes/DevSactum/backend/go-api/internal/handlers.(*AuthHandler).Register-fm (4 handlers)
+[GIN-debug] POST   /api/v1/auth/login        --> github.com/gpb-codes/DevSactum/backend/go-api/internal/handlers.(*AuthHandler).Login-fm (4 handlers)
+[GIN-debug] GET    /api/v1/auth/user/:id     --> github.com/gpb-codes/DevSactum/backend/go-api/internal/handlers.(*AuthHandler).GetProfile-fm (5 handlers)
+[GIN-debug] PUT    /api/v1/auth/user/:id     --> github.com/gpb-codes/DevSactum/backend/go-api/internal/handlers.(*AuthHandler).UpdateProfile-fm (5 handlers)
+[GIN-debug] GET    /api/v1/posts             --> github.com/gpb-codes/DevSactum/backend/go-api/internal/handlers.(*PostHandler).GetFeed-fm (5 handlers)
+[GIN-debug] GET    /api/v1/posts/:id         --> github.com/gpb-codes/DevSactum/backend/go-api/internal/handlers.(*PostHandler).GetPost-fm (5 handlers)
+[GIN-debug] POST   /api/v1/posts             --> github.com/gpb-codes/DevSactum/backend/go-api/internal/handlers.(*PostHandler).CreatePost-fm (5 handlers)
+[GIN-debug] POST   /api/v1/posts/:id/like    --> github.com/gpb-codes/DevSactum/backend/go-api/internal/handlers.(*PostHandler).LikePost-fm (5 handlers)
+[GIN-debug] DELETE /api/v1/posts/:id         --> github.com/gpb-codes/DevSactum/backend/go-api/internal/handlers.(*PostHandler).DeletePost-fm (5 handlers)
+[GIN-debug] GET    /api/v1/posts/user/:user_id --> github.com/gpb-codes/DevSactum/backend/go-api/internal/handlers.(*PostHandler).GetUserPosts-fm (5 handlers)
+[GIN-debug] GET    /api/v1/posts/tag/:tag    --> github.com/gpb-codes/DevSactum/backend/go-api/internal/handlers.(*PostHandler).GetPostsByTag-fm (5 handlers)
+[GIN-debug] GET    /api/v1/communities       --> github.com/gpb-codes/DevSactum/backend/go-api/internal/handlers.(*CommunityHandler).ListCommunities-fm (4 handlers)
+[GIN-debug] GET    /api/v1/communities/:id   --> github.com/gpb-codes/DevSactum/backend/go-api/internal/handlers.(*CommunityHandler).GetCommunity-fm (4 handlers)
+[GIN-debug] POST   /api/v1/communities       --> github.com/gpb-codes/DevSactum/backend/go-api/internal/handlers.(*CommunityHandler).CreateCommunity-fm (5 handlers)
+[GIN-debug] POST   /api/v1/communities/:id/join --> github.com/gpb-codes/DevSactum/backend/go-api/internal/handlers.(*CommunityHandler).JoinCommunity-fm (5 handlers)
+[GIN-debug] POST   /api/v1/communities/:id/leave --> github.com/gpb-codes/DevSactum/backend/go-api/internal/handlers.(*CommunityHandler).LeaveCommunity-fm (5 handlers)
+[GIN-debug] POST   /api/v1/messages          --> github.com/gpb-codes/DevSactum/backend/go-api/internal/handlers.(*MessageHandler).SendMessage-fm (5 handlers)
+[GIN-debug] GET    /api/v1/messages/direct/:user_id_1/:user_id_2 --> github.com/gpb-codes/DevSactum/backend/go-api/internal/handlers.(*MessageHandler).GetDirectMessages-fm (5 handlers)
+[GIN-debug] GET    /api/v1/messages/community/:community_id --> github.com/gpb-codes/DevSactum/backend/go-api/internal/handlers.(*MessageHandler).GetCommunityMessages-fm (4 handlers)
+[GIN-debug] GET    /api/v1/messages/unread   --> github.com/gpb-codes/DevSactum/backend/go-api/internal/handlers.(*MessageHandler).GetUnreadCount-fm (5 handlers)
+[GIN-debug] GET    /api/v1/reputation/user/:user_id --> github.com/gpb-codes/DevSactum/backend/go-api/internal/handlers.(*ReputationHandler).GetUserReputation-fm (4 handlers)
+[GIN-debug] GET    /api/v1/reputation/user/:user_id/history --> github.com/gpb-codes/DevSactum/backend/go-api/internal/handlers.(*ReputationHandler).GetReputationHistory-fm (4 handlers)
+[GIN-debug] GET    /api/v1/reputation/leaderboard --> github.com/gpb-codes/DevSactum/backend/go-api/internal/handlers.(*ReputationHandler).GetLeaderboard-fm (4 handlers)
+2026/06/18 18:56:57 Go API running on port 8000
+[GIN-debug] [WARNING] You trusted all proxies, this is NOT safe. We recommend you to set a value.
+Please check https://pkg.go.dev/github.com/gin-gonic/gin#readme-don-t-trust-all-proxies for details.
+[GIN-debug] Listening and serving HTTP on :8000
+[GIN] 2026/06/18 - 18:58:39 | 200 |            0s |             ::1 | GET      "/health"
+[GIN] 2026/06/18 - 20:35:34 | 204 |            0s |             ::1 | OPTIONS  "/posts?limit=20&offset=0"
+[GIN] 2026/06/18 - 20:35:34 | 204 |            0s |             ::1 | OPTIONS  "/posts?limit=20&offset=0"
+[GIN] 2026/06/18 - 20:35:34 | 404 |            0s |             ::1 | GET      "/posts?limit=20&offset=0"
+[GIN] 2026/06/18 - 20:35:34 | 404 |            0s |             ::1 | GET      "/posts?limit=20&offset=0"
+[GIN] 2026/06/18 - 20:36:15 | 204 |            0s |             ::1 | OPTIONS  "/posts?limit=20&offset=0"
+[GIN] 2026/06/18 - 20:36:15 | 404 |            0s |             ::1 | GET      "/posts?limit=20&offset=0"
+[GIN] 2026/06/18 - 20:36:15 | 404 |            0s |             ::1 | GET      "/posts?limit=20&offset=0"

@@ -11,27 +11,43 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./apps/web
+        working-directory: ./Frontend/devsactum-next
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: "npm"
-          cache-dependency-path: ./apps/web/package-lock.json
+          cache-dependency-path: ./Frontend/devsactum-next/package-lock.json
       - run: npm ci
       - run: npm run lint
       - run: npm run build
 
-  api:
+  go-api:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./apps/api
+        working-directory: ./backend/go-api
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-go@v5
         with:
-          python-version: "3.12"
-      - run: pip install -r requirements.txt
-      - run: python -c "from main import app; print('API loads OK')"
+          go-version: "1.22"
+          cache-dependency-path: ./backend/go-api/go.sum
+      - run: go mod download
+      - run: go vet ./...
+
+  nestjs-api:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend/nestjs-api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+          cache-dependency-path: ./backend/nestjs-api/package-lock.json
+      - run: npm ci
+      - run: npm run build

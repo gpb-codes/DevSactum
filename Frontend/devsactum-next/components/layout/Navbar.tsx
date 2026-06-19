@@ -3,7 +3,8 @@
 import React, { useState } from "react"
 import {
   Terminal, Compass, Users, Bookmark, MessageCircle,
-  User, Settings, Bell, ChevronLeft, ChevronRight, Sparkles, Hash,
+  User, Settings, Bell, ChevronLeft, ChevronRight, Sparkles, Hash, Briefcase, Brain,
+  Code2, DollarSign, Shield, Award, Building2, Phone,
 } from "lucide-react"
 import { useNav } from "@/context/NavContext"
 import type { Page } from "@/types"
@@ -15,8 +16,19 @@ const NAV_SECTIONS: {
   {
     label: "Navegación",
     items: [
-      { name: "Feed",     Icon: Hash,    color: "text-accent"    },
-      { name: "Explorar", Icon: Compass, color: "text-tertiary"  },
+      { name: "Feed",             Icon: Hash,      color: "text-accent"    },
+      { name: "Explorar",         Icon: Compass,   color: "text-tertiary"  },
+      { name: "Bolsa de Empleo",  Icon: Briefcase, color: "text-success"   },
+      { name: "Empleo IA",        Icon: Brain,     color: "text-primary"   },
+      { name: "Freelancing",      Icon: DollarSign, color: "text-warning"  },
+    ],
+  },
+  {
+    label: "Tu Carrera",
+    items: [
+      { name: "Portafolio",       Icon: Code2,     color: "text-secondary" },
+      { name: "Reputación",       Icon: Award,     color: "text-accent"    },
+      { name: "Validación",       Icon: Shield,    color: "text-success"   },
     ],
   },
   {
@@ -35,11 +47,30 @@ const NAV_SECTIONS: {
       { name: "Configuración",  Icon: Settings              },
     ],
   },
+  {
+    label: "Empresa",
+    items: [
+      { name: "Nosotros",       Icon: Building2, color: "text-secondary" },
+      { name: "Contáctanos",    Icon: Phone,     color: "text-accent"    },
+    ],
+  },
 ]
 
 export default function Navbar() {
   const { activePage, setActivePage } = useNav()
   const [collapsed, setCollapsed] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+
+  React.useEffect(() => {
+    const check = () => {
+      const mobile = window.innerWidth < 768
+      setIsMobile(mobile)
+      if (mobile) setCollapsed(true)
+    }
+    check()
+    window.addEventListener("resize", check)
+    return () => window.removeEventListener("resize", check)
+  }, [])
 
   return (
     <nav
@@ -51,9 +82,9 @@ export default function Navbar() {
         flexDirection: "column",
         overflow: "hidden",
         background: "var(--color-bg-surface)",
-        borderRight: "1px solid var(--color-border)",
         transition: "width 0.25s ease, min-width 0.25s ease",
         flexShrink: 0,
+        ...(isMobile ? { position: "fixed" as const, zIndex: 40, height: "100%" } : {}),
       }}
     >
       {/* Logo */}

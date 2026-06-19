@@ -1,14 +1,16 @@
-import { Controller, Get, Post, Delete, Body, Param, Query } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Body, Param, Query, UseGuards, Request, ValidationPipe } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { PostsService } from './posts.service';
-import { Post as PostEntity } from './post.entity';
+import { CreatePostDto } from './dto/post.dto';
 
 @Controller('posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @Post()
-  async create(@Body() data: Partial<PostEntity>) {
-    const post = await this.postsService.create(data);
+  @UseGuards(AuthGuard('jwt'))
+  async create(@Body(new ValidationPipe({ transform: true, whitelist: true })) data: CreatePostDto, @Request() req) {
+    const post = await this.postsService.create({ ...data, userId: req.user.id });
     return { post };
   }
 
@@ -19,12 +21,6 @@ export class PostsController {
       offset ? parseInt(offset, 10) : 0,
     );
     return { posts };
-  }
-
-  @Get(':id')
-  async findOne(@Param('id') id: string) {
-    const post = await this.postsService.findById(id);
-    return { post };
   }
 
   @Get('user/:userId')
@@ -55,14 +51,22 @@ export class PostsController {
     return { posts };
   }
 
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    const post = await this.postsService.findById(id);
+    return { post };
+  }
+
   @Post(':id/like')
+  @UseGuards(AuthGuard('jwt'))
   async like(@Param('id') id: string) {
     const post = await this.postsService.like(id);
     return { post };
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string) {
+  @UseGuards(AuthGuard('jwt'))
+  async remove(@Param('id') id: string, @Request() req) {
     await this.postsService.delete(id);
     return { message: 'Post deleted' };
   }

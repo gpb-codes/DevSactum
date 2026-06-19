@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"time"
+
 	"github.com/gpb-codes/DevSactum/backend/go-api/internal/models"
 	"github.com/google/uuid"
 )
@@ -49,9 +51,9 @@ func GetUserByUsername(username string) (*models.User, error) {
 }
 
 func UpdateUser(user *models.User) error {
-	query := `UPDATE users SET display_name = $2, avatar_url = $3, bio = $4, updated_at = NOW()
+	query := `UPDATE users SET display_name = $2, avatar_url = $3, bio = $4, updated_at = $5
 			  WHERE id = $1 RETURNING updated_at`
-	return DB.QueryRow(query, user.ID, user.DisplayName, user.AvatarURL, user.Bio).Scan(&user.UpdatedAt)
+	return DB.QueryRow(query, user.ID, user.DisplayName, user.AvatarURL, user.Bio, time.Now()).Scan(&user.UpdatedAt)
 }
 
 func DeleteUser(id uuid.UUID) error {

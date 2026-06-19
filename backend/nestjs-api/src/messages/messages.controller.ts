@@ -1,19 +1,21 @@
-import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Query, UseGuards, Request, ValidationPipe } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { MessagesService } from './messages.service';
-import { Message } from './message.entity';
+import { CreateMessageDto } from './dto/message.dto';
 
 @Controller('messages')
 export class MessagesController {
   constructor(private readonly messagesService: MessagesService) {}
 
   @Post()
-  async send(@Body() data: { senderId: string } & Partial<Message>) {
-    const { senderId, ...messageData } = data;
-    const message = await this.messagesService.send(senderId, messageData);
+  @UseGuards(AuthGuard('jwt'))
+  async send(@Body(new ValidationPipe({ transform: true, whitelist: true })) data: CreateMessageDto, @Request() req) {
+    const message = await this.messagesService.send(req.user.id, data);
     return { message };
   }
 
   @Get('direct/:userId1/:userId2')
+  @UseGuards(AuthGuard('jwt'))
   async getDirectMessages(
     @Param('userId1') userId1: string,
     @Param('userId2') userId2: string,
@@ -44,12 +46,14 @@ export class MessagesController {
   }
 
   @Get('unread/:userId')
+  @UseGuards(AuthGuard('jwt'))
   async getUnreadCount(@Param('userId') userId: string) {
     const count = await this.messagesService.getUnreadCount(userId);
     return { unread_count: count };
   }
 
   @Post(':id/read')
+  @UseGuards(AuthGuard('jwt'))
   async markAsRead(@Param('id') id: string) {
     await this.messagesService.markAsRead(id);
     return { message: 'Marked as read' };
