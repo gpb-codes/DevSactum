@@ -1,32 +1,37 @@
 {
-  "name": "devsanctum",
+<<<<<<< HEAD
+  "name": "devsactum",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint",
+    "test": "vitest",
+    "test:ui": "vitest --ui"
   },
   "dependencies": {
-    "lucide-react": "^0.513.0",
-    "next": "15.3.3",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "clsx": "^2.1.1",
+    "lucide-react": "^1.7.0",
+    "next": "16.2.2",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "tailwind-merge": "^3.6.0"
   },
   "devDependencies": {
-    "@eslint/compat": "^2.1.0",
-    "@tailwindcss/postcss": "^4.1.5",
-    "@testing-library/jest-dom": "^6.9.1",
-    "@testing-library/react": "^16.3.2",
-    "@types/node": "^22.15.3",
-    "@types/react": "^19.1.2",
-    "@types/react-dom": "^19.1.2",
-    "eslint": "^9.25.1",
-    "eslint-config-next": "^15.3.3",
-    "jsdom": "^29.1.1",
-    "tailwindcss": "^4.1.5",
-    "typescript": "^5.8.3",
-    "vitest": "^4.1.9"
+    "@tailwindcss/postcss": "^4",
+    "@testing-library/jest-dom": "^6",
+    "@testing-library/react": "^16",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.2",
+    "jsdom": "^25||^26",
+    "tailwindcss": "^4",
+    "typescript": "^5",
+    "vitest": "^3||^4"
   }
 }
