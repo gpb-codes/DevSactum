@@ -1,14 +1,14 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 
-const PUBLIC_ROUTES = ["/", "/empleo", "/empleo/auth"]
+const PUBLIC_ROUTES = ["/", "/empleo/auth"]
 const PROTECTED_PREFIXES = ["/empleo/dashboard", "/empleo/premium"]
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  const isPublic = PUBLIC_ROUTES.some(r => pathname === r || pathname.startsWith(r + "/"))
-  const isProtected = PROTECTED_PREFIXES.some(p => pathname.startsWith(p))
+  const isPublic = PUBLIC_ROUTES.some(r => pathname === r)
+  const isProtected = PROTECTED_PREFIXES.some(p => pathname === p || pathname.startsWith(p + "/"))
 
   if (isProtected && !isPublic) {
     const hasSession = request.cookies.get("ds-session")

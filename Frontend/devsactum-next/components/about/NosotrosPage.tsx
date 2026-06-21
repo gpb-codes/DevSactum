@@ -3,10 +3,9 @@
 import { Terminal, Users, Target, Eye, Heart, Code2, Globe, Zap } from "lucide-react"
 
 const TEAM = [
-  { name: "Gabriel Peña", role: "CEO & Fundador", initials: "GP", color: "from-accent to-secondary" },
-  { name: "Integrante 2", role: "CTO & Co-Fundador", initials: "I2", color: "from-primary to-accent" },
-  { name: "Integrante 3", role: "Diseñador UX/UI", initials: "I3", color: "from-success to-primary" },
-  { name: "Integrante 4", role: "Backend Developer", initials: "I4", color: "from-warning to-secondary" },
+  { name: "Gabriel Pedreros", role: "CEO & Fundador · Backend Developer", initials: "GP", color: "from-accent to-secondary" },
+  { name: "Pablo Cocio", role: "CTO & CO-Fundador · Diseñador UX/UI", initials: "PC", color: "from-primary to-accent" },
+  { name: "Fernando Ibañez", role: "DB Admin", initials: "FI", color: "from-success to-primary" },
 ]
 
 const VALUES = [

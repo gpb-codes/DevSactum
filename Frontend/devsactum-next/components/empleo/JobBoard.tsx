@@ -4,12 +4,14 @@ import React, { useState } from "react"
 import {
   Search, MapPin, Clock, Users, Star, ArrowUpRight, Building2,
   Filter, Bookmark, BookmarkCheck, DollarSign, Globe, Zap, Flame,
-  ChevronDown, Briefcase, TrendingUp,
+  ChevronDown, Briefcase, TrendingUp, ChevronUp, CheckCircle,
+  ExternalLink, Send,
 } from "lucide-react"
 import { useNav } from "@/context/NavContext"
 import { useToast } from "@/components/ui/Toast"
 import { useJobAuth } from "@/context/JobAuthContext"
 import { MOCK_JOBS } from "@/lib/mock-jobs"
+import { setApplyJobId } from "@/lib/apply-state"
 import type { JobListing, JobType, ExperienceLevel } from "@/types"
 
 const JOB_TYPES: { key: JobType | "all"; label: string }[] = [
@@ -35,80 +37,162 @@ function formatSalary(min: number, max: number, currency: string, type: string) 
   return `$${(min / 1000).toFixed(0)}k – $${(max / 1000).toFixed(0)}k`
 }
 
-function JobCard({ job, onBookmark, bookmarked }: { job: JobListing; onBookmark: () => void; bookmarked: boolean }) {
+function JobCard({ job, onBookmark, bookmarked, onApply }: { job: JobListing; onBookmark: () => void; bookmarked: boolean; onApply: () => void }) {
+  const [expanded, setExpanded] = useState(false)
+
   return (
-    <div className={`bg-bg-surface border rounded-[14px] p-5 transition-all duration-200 cursor-pointer group ${
-      job.featured ? "border-accent-border hover:shadow-glow" : "border-border hover:border-accent-border"
-    }`}>
-      {job.featured && (
-        <div className="flex items-center gap-1.5 mb-3">
-          <Star size={11} className="text-accent" fill="currentColor" strokeWidth={0} />
-          <span className="text-[9px] font-extrabold uppercase tracking-[1.5px] text-accent">Destacado</span>
-          {job.urgent && (
-            <span className="ml-1 text-[9px] font-extrabold uppercase tracking-[1.5px] text-danger bg-danger-soft border border-[rgba(248,113,113,0.3)] px-1.5 py-0.5 rounded-full">
-              Urgente
-            </span>
-          )}
-        </div>
-      )}
-
-      <div className="flex items-start gap-4">
-        <div
-          className="w-11 h-11 rounded-[10px] flex items-center justify-center shrink-0"
-          style={{ background: job.company.avatarBg, color: job.company.avatarColor }}
-        >
-          {job.company.initials}
-        </div>
-
-        <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between gap-2 mb-1">
-            <div>
-              <h3 className="text-[14px] font-extrabold text-text-h m-0 group-hover:text-accent transition-colors leading-[1.3]">
-                {job.title}
-              </h3>
-              <div className="flex items-center gap-2 mt-1">
-                <span className="text-[12px] font-semibold text-text">{job.company.name}</span>
-                {job.company.verified && (
-                  <span className="text-[9px] font-bold text-online bg-success-soft border border-[rgba(74,222,128,0.3)] px-1.5 py-0.5 rounded-full">✓</span>
-                )}
-                {job.company.premium && (
-                  <span className="text-[9px] font-bold text-accent bg-accent-bg border border-accent-border px-1.5 py-0.5 rounded-full">PRO</span>
-                )}
-              </div>
-            </div>
-            <button
-              onClick={(e) => { e.stopPropagation(); onBookmark() }}
-              className="bg-transparent border-none cursor-pointer p-1 text-text hover:text-accent transition-colors shrink-0"
-            >
-              {bookmarked ? <BookmarkCheck size={16} className="text-accent" strokeWidth={2} /> : <Bookmark size={16} strokeWidth={1.8} />}
-            </button>
-          </div>
-
-          <div className="flex items-center gap-3 mt-2.5 text-[11px] text-text flex-wrap">
-            <span className="flex items-center gap-1"><MapPin size={11} strokeWidth={2} />{job.location}</span>
-            {job.remote && <span className="flex items-center gap-1 text-online"><Globe size={11} strokeWidth={2} />Remoto</span>}
-            <span className="flex items-center gap-1"><Clock size={11} strokeWidth={2} />{job.postedAt}</span>
-            <span className="flex items-center gap-1"><Users size={11} strokeWidth={2} />{job.applicants} postulados</span>
-          </div>
-
-          <div className="flex items-center gap-2 mt-3 flex-wrap">
-            <span className="bg-bg-hover border border-border text-text text-[10px] font-bold px-2.5 py-0.5 rounded-full">{job.type}</span>
-            <span className="bg-bg-hover border border-border text-text text-[10px] font-bold px-2.5 py-0.5 rounded-full">{job.experience}</span>
-            <span className="flex items-center gap-1 bg-success-soft border border-[rgba(74,222,128,0.2)] text-success text-[10px] font-bold px-2.5 py-0.5 rounded-full">
-              <DollarSign size={9} strokeWidth={2.5} />
-              {formatSalary(job.salaryMin, job.salaryMax, job.currency, job.type)}
-            </span>
-          </div>
-
-          <div className="flex gap-1.5 mt-3 flex-wrap">
-            {job.tags.map(tag => (
-              <span key={tag} className="bg-accent-bg text-accent border border-accent-border text-[9px] font-bold px-2 py-0.5 rounded-full">
-                {tag}
+    <div>
+      <div
+        onClick={() => setExpanded(!expanded)}
+        className={`bg-bg-surface border rounded-[14px] p-5 transition-all duration-200 cursor-pointer group ${
+          job.featured ? "border-accent-border hover:shadow-glow" : "border-border hover:border-accent-border"
+        } ${expanded ? "rounded-b-none border-b-0" : ""}`}
+      >
+        {job.featured && (
+          <div className="flex items-center gap-1.5 mb-3">
+            <Star size={11} className="text-accent" fill="currentColor" strokeWidth={0} />
+            <span className="text-[9px] font-extrabold uppercase tracking-[1.5px] text-accent">Destacado</span>
+            {job.urgent && (
+              <span className="ml-1 text-[9px] font-extrabold uppercase tracking-[1.5px] text-danger bg-danger-soft border border-[rgba(248,113,113,0.3)] px-1.5 py-0.5 rounded-full">
+                Urgente
               </span>
-            ))}
+            )}
+          </div>
+        )}
+
+        <div className="flex items-start gap-4">
+          <div
+            className="w-11 h-11 rounded-[10px] flex items-center justify-center shrink-0"
+            style={{ background: job.company.avatarBg, color: job.company.avatarColor }}
+          >
+            {job.company.initials}
+          </div>
+
+          <div className="flex-1 min-w-0">
+            <div className="flex items-start justify-between gap-2 mb-1">
+              <div>
+                <h3 className="text-[14px] font-extrabold text-text-h m-0 group-hover:text-accent transition-colors leading-[1.3]">
+                  {job.title}
+                </h3>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-[12px] font-semibold text-text">{job.company.name}</span>
+                  {job.company.verified && (
+                    <span className="text-[9px] font-bold text-online bg-success-soft border border-[rgba(74,222,128,0.3)] px-1.5 py-0.5 rounded-full">✓</span>
+                  )}
+                  {job.company.premium && (
+                    <span className="text-[9px] font-bold text-accent bg-accent-bg border border-accent-border px-1.5 py-0.5 rounded-full">PRO</span>
+                  )}
+                </div>
+              </div>
+              <button
+                onClick={(e) => { e.stopPropagation(); onBookmark() }}
+                className="bg-transparent border-none cursor-pointer p-1 text-text hover:text-accent transition-colors shrink-0"
+              >
+                {bookmarked ? <BookmarkCheck size={16} className="text-accent" strokeWidth={2} /> : <Bookmark size={16} strokeWidth={1.8} />}
+              </button>
+            </div>
+
+            <div className="flex items-center gap-3 mt-2.5 text-[11px] text-text flex-wrap">
+              <span className="flex items-center gap-1"><MapPin size={11} strokeWidth={2} />{job.location}</span>
+              {job.remote && <span className="flex items-center gap-1 text-online"><Globe size={11} strokeWidth={2} />Remoto</span>}
+              <span className="flex items-center gap-1"><Clock size={11} strokeWidth={2} />{job.postedAt}</span>
+              <span className="flex items-center gap-1"><Users size={11} strokeWidth={2} />{job.applicants} postulados</span>
+            </div>
+
+            <div className="flex items-center gap-2 mt-3 flex-wrap">
+              <span className="bg-bg-hover border border-border text-text text-[10px] font-bold px-2.5 py-0.5 rounded-full">{job.type}</span>
+              <span className="bg-bg-hover border border-border text-text text-[10px] font-bold px-2.5 py-0.5 rounded-full">{job.experience}</span>
+              <span className="flex items-center gap-1 bg-success-soft border border-[rgba(74,222,128,0.2)] text-success text-[10px] font-bold px-2.5 py-0.5 rounded-full">
+                <DollarSign size={9} strokeWidth={2.5} />
+                {formatSalary(job.salaryMin, job.salaryMax, job.currency, job.type)}
+              </span>
+            </div>
+
+            <div className="flex gap-1.5 mt-3 flex-wrap">
+              {job.tags.map(tag => (
+                <span key={tag} className="bg-accent-bg text-accent border border-accent-border text-[9px] font-bold px-2 py-0.5 rounded-full">
+                  {tag}
+                </span>
+              ))}
+            </div>
+
+            <div className="flex items-center gap-1 mt-3 text-[10px] font-semibold text-text opacity-50">
+              {expanded ? <ChevronUp size={12} strokeWidth={2.5} /> : <ChevronDown size={12} strokeWidth={2.5} />}
+              {expanded ? "Mostrar menos" : "Ver detalles"}
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Expanded detail */}
+      {expanded && (
+        <div className="bg-bg-surface border border-t-0 rounded-b-[14px] px-5 pb-6 animate-fade-in" style={{ borderColor: job.featured ? "var(--color-accent-border)" : "var(--color-border)" }}>
+          <div className="h-px bg-border mb-5" />
+
+          {/* Description */}
+          <div className="mb-5">
+            <h4 className="text-[11px] font-extrabold uppercase tracking-[1.5px] text-text mb-2">Descripción</h4>
+            <p className="text-[13px] text-text leading-relaxed">{job.description}</p>
+          </div>
+
+          {/* Requirements */}
+          <div className="mb-5">
+            <h4 className="text-[11px] font-extrabold uppercase tracking-[1.5px] text-text mb-2">Requisitos</h4>
+            <div className="flex flex-col gap-1.5">
+              {job.requirements.map(req => (
+                <div key={req} className="flex items-start gap-2">
+                  <CheckCircle size={12} className="text-accent shrink-0 mt-0.5" strokeWidth={2.5} />
+                  <span className="text-[12px] text-text">{req}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Benefits */}
+          <div className="mb-5">
+            <h4 className="text-[11px] font-extrabold uppercase tracking-[1.5px] text-text mb-2">Beneficios</h4>
+            <div className="flex flex-wrap gap-2">
+              {job.benefits.map(b => (
+                <span key={b} className="bg-success-soft border border-[rgba(74,222,128,0.2)] text-success text-[10px] font-bold px-2.5 py-1 rounded-full">
+                  {b}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Company info */}
+          <div className="bg-bg border border-border rounded-[10px] p-4 mb-5">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-9 h-9 rounded-[8px] flex items-center justify-center text-[13px] font-black" style={{ background: job.company.avatarBg, color: job.company.avatarColor }}>
+                {job.company.initials}
+              </div>
+              <div>
+                <h5 className="text-[13px] font-bold text-text-h m-0">{job.company.name}</h5>
+                <p className="text-[10px] text-text opacity-70 m-0">{job.company.industry} · {job.company.size} empleados</p>
+              </div>
+            </div>
+            <p className="text-[12px] text-text mt-2 leading-relaxed">{job.company.description}</p>
+            <a
+              href={job.company.website}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-[11px] font-bold text-accent mt-1 hover:underline"
+            >
+              <ExternalLink size={11} strokeWidth={2} />
+              {job.company.website.replace("https://", "")}
+            </a>
+          </div>
+
+          {/* Apply */}
+          <button
+            onClick={(e) => { e.stopPropagation(); onApply() }}
+            className="w-full h-[44px] rounded-[9px] bg-accent text-[#1a0033] border-none flex items-center justify-center gap-2 text-[13px] font-extrabold cursor-pointer hover:opacity-85 transition-opacity"
+          >
+            <Send size={14} strokeWidth={2.5} />
+            Postularme ahora
+          </button>
+        </div>
+      )}
     </div>
   )
 }
@@ -117,6 +201,11 @@ export default function JobBoard() {
   const { setActivePage } = useNav()
   const { success } = useToast()
   const { isAuthenticated } = useJobAuth()
+
+  function handleApply(jobId: string) {
+    setApplyJobId(jobId)
+    setActivePage("Postulación")
+  }
   const [search, setSearch] = useState("")
   const [typeFilter, setTypeFilter] = useState<JobType | "all">("all")
   const [expFilter, setExpFilter] = useState<ExperienceLevel | "all">("all")
@@ -165,7 +254,7 @@ export default function JobBoard() {
             </div>
           </div>
           <button
-            onClick={() => setActivePage("Empleo Auth")}
+            onClick={() => setActivePage("Login")}
             className="flex items-center gap-1.5 bg-accent text-[#1a0033] border-none rounded-[8px] px-4 py-2 text-[11px] font-bold cursor-pointer hover:opacity-85 transition-opacity shrink-0"
           >
             Empezar <ArrowUpRight size={12} strokeWidth={2.5} />
@@ -258,7 +347,7 @@ export default function JobBoard() {
           <div className="flex flex-col gap-3">
             {featuredJobs.map((job, idx) => (
               <div key={job.id} className="animate-fade-in" style={{ animationDelay: `${idx * 50}ms` }}>
-                <JobCard job={job} bookmarked={!!bookmarks[job.id]} onBookmark={() => {
+                <JobCard job={job} bookmarked={!!bookmarks[job.id]} onApply={() => handleApply(job.id)} onBookmark={() => {
                   setBookmarks(p => ({ ...p, [job.id]: !p[job.id] }))
                   if (!bookmarks[job.id]) success("Guardado", "Oferta guardada en tu lista")
                 }} />
@@ -284,7 +373,7 @@ export default function JobBoard() {
         <div className="flex flex-col gap-3">
           {regularJobs.map((job, idx) => (
             <div key={job.id} className="animate-fade-in" style={{ animationDelay: `${idx * 40}ms` }}>
-              <JobCard job={job} bookmarked={!!bookmarks[job.id]} onBookmark={() => {
+              <JobCard job={job} bookmarked={!!bookmarks[job.id]} onApply={() => handleApply(job.id)} onBookmark={() => {
                 setBookmarks(p => ({ ...p, [job.id]: !p[job.id] }))
                 if (!bookmarks[job.id]) success("Guardado", "Oferta guardada en tu lista")
               }} />
@@ -309,7 +398,7 @@ export default function JobBoard() {
           Publica ofertas y encuentra a los mejores developers del ecosistema. Empieza gratis.
         </p>
         <button
-          onClick={() => setActivePage("Empleo Auth")}
+          onClick={() => setActivePage("Login")}
           className="bg-accent text-[#1a0033] border-none rounded-[10px] px-6 py-2.5 text-[12px] font-extrabold cursor-pointer hover:opacity-85 transition-opacity"
         >
           Publicar empleo gratis

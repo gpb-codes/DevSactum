@@ -9,7 +9,6 @@ export type Page =
   | "Configuración"
   | "Login"
   | "Bolsa de Empleo"
-  | "Empleo Auth"
   | "Empleo Dashboard"
   | "Empleo Premium"
   | "Empleo IA"
@@ -19,6 +18,7 @@ export type Page =
   | "Reputación"
   | "Nosotros"
   | "Contáctanos"
+  | "Postulación"
 
 export type NotificationType = "like" | "comment" | "follow" | "mention" | "share"
 

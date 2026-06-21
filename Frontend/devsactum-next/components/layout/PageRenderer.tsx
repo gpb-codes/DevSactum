@@ -16,7 +16,6 @@ const NotificationsPage = dynamic(() => import("@/components/notifications/Notif
 const SettingsPage      = dynamic(() => import("@/components/settings/Settingspage"),            { ...opts, ssr: false })
 const SavedPage         = dynamic(() => import("@/components/saved/SavedPage"),                  { ...opts, ssr: false })
 const JobBoard          = dynamic(() => import("@/components/empleo/JobBoard"),                  { ...opts, ssr: false })
-const EmpleoAuth        = dynamic(() => import("@/components/empleo/EmpleoAuth"),                { ...opts, ssr: false })
 const CompanyDashboard  = dynamic(() => import("@/components/empleo/CompanyDashboard"),          { ...opts, ssr: false })
 const PremiumPage       = dynamic(() => import("@/components/empleo/PremiumPage"),               { ...opts, ssr: false })
 const AIToolsPage       = dynamic(() => import("@/components/empleo/AIToolsPage"),               { ...opts, ssr: false })
@@ -26,6 +25,7 @@ const ValidationPage    = dynamic(() => import("@/components/validation/Validati
 const ReputationPage    = dynamic(() => import("@/components/reputation/ReputationPage"),         { ...opts, ssr: false })
 const NosotrosPage      = dynamic(() => import("@/components/about/NosotrosPage"),                { ...opts, ssr: false })
 const ContactPage       = dynamic(() => import("@/components/about/ContactPage"),                 { ...opts, ssr: false })
+const PostulacionPage   = dynamic(() => import("@/components/empleo/PostulacionPage"),            { ...opts, ssr: false })
 
 export default function PageRenderer() {
   const { activePage } = useNav()
@@ -41,7 +41,6 @@ export default function PageRenderer() {
     case "Notificaciones":    return <NotificationsPage />
     case "Configuración":     return <SettingsPage />
     case "Bolsa de Empleo":   return <JobBoard />
-    case "Empleo Auth":       return <EmpleoAuth />
     case "Empleo Dashboard":  return <CompanyDashboard />
     case "Empleo Premium":    return <PremiumPage />
     case "Empleo IA":         return <AIToolsPage />
@@ -51,6 +50,7 @@ export default function PageRenderer() {
     case "Reputación":        return <ReputationPage />
     case "Nosotros":          return <NosotrosPage />
     case "Contáctanos":       return <ContactPage />
+    case "Postulación":       return <PostulacionPage />
     default:                  return <Feed />
   }
 }

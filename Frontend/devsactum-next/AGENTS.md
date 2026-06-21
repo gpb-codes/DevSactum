@@ -1,5 +1,6 @@
-<!-- BEGIN:nextjs-agent-rules -->
-# This is NOT the Next.js you know
+# Devsanctum — Next.js 15
 
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
-<!-- END:nextjs-agent-rules -->
+This project uses Next.js 15 with Turbopack, React 19, and Tailwind CSS v4.
+- App Router with SPA-like client-side navigation via `NavContext`
+- All pages are dynamically imported in `PageRenderer`
+- Two backend clients: Go (`apiGo`) and NestJS (`apiNestjs`)
