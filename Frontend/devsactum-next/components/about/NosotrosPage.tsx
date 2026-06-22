@@ -1,6 +1,7 @@
 "use client"
 
 import { Terminal, Users, Target, Eye, Heart, Code2, Globe, Zap } from "lucide-react"
+import { GradientHeading } from "@/components/ui/gradient-heading"
 
 const TEAM = [
   { name: "Gabriel Pedreros", role: "CEO & Fundador · Backend Developer", initials: "GP", color: "from-accent to-secondary" },
@@ -17,7 +18,7 @@ const VALUES = [
 
 export default function NosotrosPage() {
   return (
-    <div className="min-h-screen pb-20">
+    <div className="min-h-screen pb-20 animate-fade-in">
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
         {/* Hero */}
         <div className="text-center py-12">
@@ -96,8 +97,8 @@ export default function NosotrosPage() {
 
         {/* Valores */}
         <div className="mb-12">
-          <h2 className="text-2xl font-black text-text mb-6 text-center">Nuestros Valores</h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <GradientHeading variant="warm" size="xs" className="text-center mb-6">Nuestros Valores</GradientHeading>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 animate-stagger">
             {VALUES.map((v) => (
               <div key={v.title} className="bg-bg-surface border border-border rounded-2xl p-5 text-center hover:border-accent-border transition-colors">
                 <div className="w-12 h-12 rounded-xl bg-accent-bg border border-accent-border flex items-center justify-center mx-auto mb-3">
@@ -112,8 +113,8 @@ export default function NosotrosPage() {
 
         {/* Equipo */}
         <div className="mb-12">
-          <h2 className="text-2xl font-black text-text mb-6 text-center">Nuestro Equipo</h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <GradientHeading variant="cool" size="xs" className="text-center mb-6">Nuestro Equipo</GradientHeading>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 animate-stagger">
             {TEAM.map((member) => (
               <div key={member.name} className="bg-bg-surface border border-border rounded-2xl p-6 text-center hover:border-accent-border transition-colors">
                 <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${member.color} flex items-center justify-center mx-auto mb-4 border-2 border-bg-base`}>
@@ -128,7 +129,7 @@ export default function NosotrosPage() {
 
         {/* Stack */}
         <div className="bg-bg-surface border border-border rounded-2xl p-8 text-center">
-          <h2 className="text-xl font-black text-text mb-4">Stack Tecnológico</h2>
+          <GradientHeading variant="accent" size="xs" className="mb-4">Stack Tecnológico</GradientHeading>
           <div className="flex flex-wrap justify-center gap-3">
             {["Next.js 15", "TypeScript", "Tailwind CSS 4", "Go + Gin", "NestJS", "PostgreSQL", "Docker", "WebSocket"].map((tech) => (
               <span key={tech} className="bg-accent-bg border border-accent-border text-accent text-xs font-bold px-3 py-1.5 rounded-full">

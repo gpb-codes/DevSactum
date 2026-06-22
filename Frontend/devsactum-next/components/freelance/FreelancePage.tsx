@@ -7,6 +7,7 @@ import {
   TrendingUp, MessageSquare, ChevronDown,
 } from "lucide-react"
 import { useToast } from "@/components/ui/Toast"
+import { GradientHeading } from "@/components/ui/gradient-heading"
 
 type GigType = "all" | "fixed" | "hourly" | "retainer"
 
@@ -108,7 +109,7 @@ export default function FreelancePage() {
   })
 
   return (
-    <div className="px-6 py-6 max-w-[900px] mx-auto">
+    <div className="px-6 py-6 max-w-[900px] mx-auto animate-fade-in">
       <section className="mb-6">
         <div className="flex items-center gap-2 mb-3">
           <Briefcase size={16} className="text-accent" strokeWidth={2} />
@@ -143,7 +144,7 @@ export default function FreelancePage() {
         ))}
       </div>
 
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3 animate-stagger">
         {filtered.map(g => <GigCard key={g.id} gig={g} />)}
       </div>
     </div>

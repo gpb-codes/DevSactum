@@ -68,7 +68,7 @@ export default function NotificationsPage() {
   })
 
   return (
-    <div className="px-6 py-6 max-w-[700px] mx-auto">
+    <div className="px-6 py-6 max-w-[700px] mx-auto animate-fade-in">
       {/* Header */}
       <section className="mb-6">
         <div className="flex items-center justify-between mb-3">
@@ -83,7 +83,7 @@ export default function NotificationsPage() {
           </div>
           <div className="flex items-center gap-2">
             <button onClick={toggleSound}
-              className="p-1.5 rounded-lg bg-bg-surface border border-border cursor-pointer text-text hover:text-text-h transition-colors"
+              className="p-1.5 rounded-lg bg-bg-surface border border-border cursor-pointer text-text hover:text-text-h transition-colors active:scale-95"
               title={soundEnabled ? "Silenciar" : "Activar sonido"}>
               {soundEnabled ? <Volume2 size={14} strokeWidth={1.8} /> : <VolumeX size={14} strokeWidth={1.8} />}
             </button>
@@ -96,13 +96,13 @@ export default function NotificationsPage() {
           <div className="flex gap-2">
             {unreadCount > 0 && (
               <button onClick={markAllRead}
-                className="flex items-center gap-1.5 bg-transparent border border-border text-text rounded-[8px] px-3 py-1.5 text-[11px] font-bold cursor-pointer hover:border-accent-border transition-colors">
+                className="flex items-center gap-1.5 bg-transparent border border-border text-text rounded-[8px] px-3 py-1.5 text-[11px] font-bold cursor-pointer hover:border-accent-border transition-colors active:scale-95">
                 <CheckCheck size={12} strokeWidth={2} /> Marcar todo leído
               </button>
             )}
             {notifications.length > 0 && (
               <button onClick={clearAll}
-                className="flex items-center gap-1.5 bg-transparent border border-border text-text rounded-[8px] px-3 py-1.5 text-[11px] font-bold cursor-pointer hover:border-danger hover:text-danger transition-colors">
+                className="flex items-center gap-1.5 bg-transparent border border-border text-text rounded-[8px] px-3 py-1.5 text-[11px] font-bold cursor-pointer hover:border-danger hover:text-danger transition-colors active:scale-95">
                 <Trash2 size={12} strokeWidth={2} /> Limpiar
               </button>
             )}

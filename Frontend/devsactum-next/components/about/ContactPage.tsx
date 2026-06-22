@@ -1,6 +1,7 @@
 "use client"
 
 import { Mail, MapPin, MessageCircle, Send, ExternalLink, Clock } from "lucide-react"
+import { GradientHeading } from "@/components/ui/gradient-heading"
 import { useState } from "react"
 
 const CONTACT_METHODS = [
@@ -29,7 +30,7 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="min-h-screen pb-20">
+    <div className="min-h-screen pb-20 animate-fade-in">
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
         {/* Hero */}
         <div className="text-center py-12">
@@ -50,7 +51,7 @@ export default function ContactPage() {
         <div className="grid lg:grid-cols-5 gap-6">
           {/* Formulario */}
           <div className="lg:col-span-3 bg-bg-surface border border-border rounded-2xl p-6 sm:p-8">
-            <h2 className="text-xl font-bold text-text mb-6">Envíanos un mensaje</h2>
+            <GradientHeading variant="accent" size="xs" className="mb-6">Envíanos un mensaje</GradientHeading>
 
             {sent && (
               <div className="bg-success-bg border border-success-border text-success text-sm font-semibold p-4 rounded-xl mb-6">
@@ -115,7 +116,7 @@ export default function ContactPage() {
           </div>
 
           {/* Info de contacto */}
-          <div className="lg:col-span-2 space-y-4">
+          <div className="lg:col-span-2 space-y-4 animate-stagger">
             {CONTACT_METHODS.map((c) => (
               <div key={c.label} className="bg-bg-surface border border-border rounded-2xl p-5 hover:border-accent-border transition-colors">
                 <div className="flex items-center gap-3">

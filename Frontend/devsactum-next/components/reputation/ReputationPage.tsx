@@ -75,7 +75,7 @@ export default function ReputationPage() {
   const [activeTab, setActiveTab] = useState<"badges" | "leaderboard" | "endorsements">("badges")
 
   return (
-    <div className="px-6 py-6 max-w-[900px] mx-auto">
+    <div className="px-6 py-6 max-w-[900px] mx-auto animate-fade-in">
       <section className="mb-6">
         <div className="flex items-center gap-2 mb-3">
           <Award size={16} className="text-accent" strokeWidth={2} />
@@ -107,7 +107,7 @@ export default function ReputationPage() {
           </div>
 
           {activeTab === "badges" && (
-            <div className="grid grid-cols-2 gap-3 animate-fade-in">
+            <div className="grid grid-cols-2 gap-3 animate-stagger">
               {BADGES.map(b => (
                 <div key={b.id} className={`bg-bg-surface border rounded-[12px] p-4 transition-all ${
                   b.earned ? "border-accent-border hover:shadow-glow" : "border-border opacity-60"
@@ -129,7 +129,7 @@ export default function ReputationPage() {
           )}
 
           {activeTab === "leaderboard" && (
-            <div className="flex flex-col animate-fade-in">
+            <div className="flex flex-col animate-stagger">
               {LEADERBOARD.map((entry, idx) => (
                 <div key={entry.rank} className={`flex items-center gap-4 py-4 ${idx < LEADERBOARD.length - 1 ? "border-b border-border" : ""}`}>
                   <span className={`text-[18px] font-black w-8 text-center ${
@@ -157,7 +157,7 @@ export default function ReputationPage() {
           )}
 
           {activeTab === "endorsements" && (
-            <div className="flex flex-col gap-3 animate-fade-in">
+            <div className="flex flex-col gap-3 animate-stagger">
               {ENDORSEMENTS.map((e, i) => (
                 <div key={i} className="bg-bg-surface border border-border rounded-[12px] p-4">
                   <div className="flex items-center justify-between mb-2">

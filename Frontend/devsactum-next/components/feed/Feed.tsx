@@ -234,10 +234,10 @@ export default function Feed() {
   }
 
   return (
-    <div className="relative pb-20">
+    <div className="relative pb-20 animate-fade-in">
       {/* Live indicator */}
       <div className="flex items-center gap-2 px-6 pt-5">
-        <div className="w-1.5 h-1.5 rounded-full bg-online animate-pulse-slow shrink-0" />
+        <div className="w-1.5 h-1.5 rounded-full bg-online animate-pulse shrink-0" />
         <span className="text-[10px] font-bold uppercase tracking-[1.2px] text-text opacity-60">
           Actividad en vivo · 124 devs activos
         </span>
@@ -249,7 +249,7 @@ export default function Feed() {
       <div className="flex gap-1 px-6 mt-5 border-b border-border">
         {["Para ti", "Siguiendo", "Tendencias"].map((tab, i) => (
           <button key={tab}
-            className={`px-4 py-2.5 text-[12px] cursor-pointer border-none bg-transparent border-b-2 -mb-px transition-colors duration-150 ${
+            className={`px-4 py-2.5 text-[12px] cursor-pointer border-none bg-transparent border-b-2 -mb-px transition-all duration-150 ${
               i === 0 ? "border-accent text-accent font-bold" : "border-transparent text-text font-medium hover:text-text-h"
             }`}
           >
@@ -259,13 +259,9 @@ export default function Feed() {
       </div>
 
       {/* Posts */}
-      <div className="px-6 py-5 flex flex-col gap-0">
-        {posts.map((post, idx) => (
-          <article
-            key={post.id}
-            className="animate-fade-in"
-            style={{ animationDelay: `${idx * 40}ms` }}
-          >
+      <div className="px-6 py-5 flex flex-col gap-0 animate-stagger">
+        {posts.map((post) => (
+          <article key={post.id}>
             <div className={`py-6 ${(post as any).milestone ? "bg-bg-surface border border-border rounded-2xl p-5 mb-4" : "border-b border-border"}`}>
               <div className="flex gap-3.5">
                 {/* Avatar */}
@@ -416,7 +412,7 @@ export default function Feed() {
       {/* FAB */}
       <button
         onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-        className="fixed right-6 bottom-6 w-12 h-12 rounded-[12px] bg-accent border-none cursor-pointer flex items-center justify-center z-50 shadow-2xl hover:opacity-85 transition-opacity animate-glow"
+        className="fixed right-6 bottom-6 w-12 h-12 rounded-[14px] bg-accent border-none cursor-pointer flex items-center justify-center z-50 shadow-2xl hover:scale-105 active:scale-95 transition-all duration-200 animate-float"
       >
         <Plus size={20} className="text-[#1a0033]" strokeWidth={2.5} />
       </button>

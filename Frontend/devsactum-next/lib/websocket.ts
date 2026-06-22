@@ -73,9 +73,8 @@ class WebSocketClient {
           this.attemptReconnect()
         }
 
-        this.ws.onerror = (err) => {
-          console.error("[WS] Error:", err)
-          reject(err)
+        this.ws.onerror = () => {
+          reject(new Error("WebSocket connection failed"))
         }
       } catch (err) {
         reject(err)

@@ -83,7 +83,7 @@ export default function SavedPage() {
   ]
 
   return (
-    <div className="px-6 py-6 max-w-[760px] mx-auto">
+    <div className="px-6 py-6 max-w-[760px] mx-auto animate-fade-in">
       {/* Header */}
       <div className="flex items-center gap-3 mb-7">
         <div className="w-9 h-9 rounded-[9px] bg-accent-bg border border-accent-border flex items-center justify-center">
@@ -134,7 +134,7 @@ export default function SavedPage() {
           description={search ? "No se encontraron resultados para tu búsqueda" : "Guarda posts, artículos y repositorios para verlos después"}
         />
       ) : (
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-3 animate-stagger">
           {filtered.map((item, idx) => {
             const { Icon, label, color, bg } = TYPE_ICONS[item.type]
             return (

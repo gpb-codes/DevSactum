@@ -155,10 +155,10 @@ export default function Chat() {
   }
 
   return (
-    <div className="flex overflow-hidden" style={{ height: "calc(100vh - 56px)" }}>
+    <div className="flex overflow-hidden animate-fade-in" style={{ height: "calc(100vh - 56px)" }}>
 
       {/* Lista de contactos */}
-      <div className="w-[300px] border-r border-border flex flex-col shrink-0">
+      <div className="w-[300px] border-r border-border flex flex-col shrink-0 animate-stagger-fast">
         <div className="px-4 pt-4 pb-3 border-b border-border">
           <div className="text-[18px] font-extrabold text-text-h tracking-tight mb-3">Mensajes</div>
           <div className="flex items-center gap-2 bg-bg-surface border border-border rounded-lg px-3 py-[7px]">

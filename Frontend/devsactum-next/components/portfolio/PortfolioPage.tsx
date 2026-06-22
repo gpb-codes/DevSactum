@@ -8,6 +8,7 @@ import {
 } from "lucide-react"
 import { useNav } from "@/context/NavContext"
 import { useJobAuth } from "@/context/JobAuthContext"
+import { GradientHeading } from "@/components/ui/gradient-heading"
 
 type ProjectType = "all" | "repo" | "project" | "contribution"
 
@@ -164,7 +165,7 @@ export default function PortfolioPage() {
   })
 
   return (
-    <div className="px-6 py-6 max-w-[900px] mx-auto">
+    <div className="px-6 py-6 max-w-[900px] mx-auto animate-fade-in">
       {/* Header */}
       <section className="mb-6">
         <div className="flex items-center gap-2 mb-3">
@@ -180,7 +181,7 @@ export default function PortfolioPage() {
       </section>
 
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-3 mb-6">
+      <div className="grid grid-cols-4 gap-3 mb-6 animate-stagger">
         {[
           { label: "Repositorios", value: "5", icon: GitBranch, color: "text-accent" },
           { label: "Stars totales", value: "45.6k", icon: Star, color: "text-warning" },
@@ -215,7 +216,7 @@ export default function PortfolioPage() {
                 }`}>{label}</button>
             ))}
           </div>
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3 animate-stagger">
             {filtered.map(p => <ProjectCard key={p.id} project={p} />)}
           </div>
         </div>
@@ -229,7 +230,7 @@ export default function PortfolioPage() {
                 <Plus size={10} strokeWidth={2.5} /> Agregar
               </button>
             </div>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 animate-stagger-fast">
               {SKILLS可视化.map(s => <SkillBar key={s.name} skill={s} />)}
             </div>
 

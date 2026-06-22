@@ -22,125 +22,61 @@ const STATUS: Record<string, string> = {
 
 export default function RightPanel() {
   return (
-    <aside
-      style={{
-        width: 260,
-        minWidth: 260,
-        height: "100%",
-        overflowY: "auto",
-        overflowX: "hidden",
-        background: "var(--color-bg-surface)",
-        borderLeft: "1px solid var(--color-border)",
-        flexShrink: 0,
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
+    <aside className="w-[260px] min-w-[260px] h-full overflow-y-auto overflow-x-hidden bg-bg-surface border-l border-border shrink-0 flex flex-col">
       {/* Tendencias */}
-      <div style={{ padding: "20px 20px 0" }}>
-        <div
-          style={{
-            fontSize: 10,
-            fontWeight: 800,
-            textTransform: "uppercase",
-            letterSpacing: "1.5px",
-            color: "var(--color-text)",
-            opacity: 0.5,
-            marginBottom: 12,
-          }}
-        >
+      <div className="px-5 pt-5">
+        <div className="text-[10px] font-extrabold uppercase tracking-[1.5px] text-text/50 mb-3">
           Tendencias
         </div>
 
-        {TRENDS.map((t, i) => (
-          <div
-            key={t.name}
-            style={{
-              padding: "12px 0",
-              borderBottom: i < TRENDS.length - 1 ? "1px solid var(--color-border)" : "none",
-              cursor: "pointer",
-            }}
-          >
-            <div style={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px", color: "var(--color-text)", opacity: 0.5, marginBottom: 3 }}>
-              {t.category}
+        <div className="animate-stagger">
+          {TRENDS.map((t, i) => (
+            <div
+              key={t.name}
+              className={`py-3 ${i < TRENDS.length - 1 ? "border-b border-border" : ""} cursor-pointer transition-all hover:opacity-80`}
+            >
+              <div className="text-[9px] font-bold uppercase tracking-[1px] text-text/50 mb-1">
+                {t.category}
+              </div>
+              <div className="text-[13px] font-bold text-text-h mb-0.5">
+                {t.name}
+              </div>
+              <div className="text-[11px] text-text/55">
+                {t.count}
+              </div>
             </div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: "var(--color-text-h)", marginBottom: 2 }}>
-              {t.name}
-            </div>
-            <div style={{ fontSize: 11, color: "var(--color-text)", opacity: 0.55 }}>
-              {t.count}
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
-      {/* Divider */}
-      <div style={{ height: 1, background: "var(--color-border)", margin: "12px 20px" }} />
+      <div className="h-px bg-border mx-5 my-3" />
 
       {/* En línea */}
-      <div style={{ padding: "0 20px 20px" }}>
-        <div
-          style={{
-            fontSize: 10,
-            fontWeight: 800,
-            textTransform: "uppercase",
-            letterSpacing: "1.5px",
-            color: "var(--color-text)",
-            opacity: 0.5,
-            marginBottom: 12,
-          }}
-        >
+      <div className="px-5 pb-5">
+        <div className="text-[10px] font-extrabold uppercase tracking-[1.5px] text-text/50 mb-3">
           En línea
         </div>
 
-        {MEMBERS.map((m) => (
-          <div
-            key={m.name}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-              padding: "8px 0",
-              borderBottom: "1px solid var(--color-border)",
-            }}
-          >
-            {/* Avatar */}
+        <div className="animate-stagger">
+          {MEMBERS.map((m) => (
             <div
-              style={{
-                width: 32,
-                height: 32,
-                borderRadius: "50%",
-                background: m.bg,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: 11,
-                fontWeight: 700,
-                color: "#fff",
-                flexShrink: 0,
-              }}
+              key={m.name}
+              className="flex items-center gap-2.5 py-2 border-b border-border transition-all hover:opacity-80"
             >
-              {m.initials}
+              <div
+                className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold text-white shrink-0"
+                style={{ background: m.bg }}
+              >
+                {m.initials}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-[12px] font-bold text-text-h leading-tight">{m.name}</div>
+                <div className="text-[10px] text-text/55">{m.role}</div>
+              </div>
+              <div className="w-2 h-2 rounded-full shrink-0" style={{ background: STATUS[m.status] }} />
             </div>
-
-            {/* Info */}
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text-h)", lineHeight: 1.3 }}>{m.name}</div>
-              <div style={{ fontSize: 10, color: "var(--color-text)", opacity: 0.55 }}>{m.role}</div>
-            </div>
-
-            {/* Status dot */}
-            <div
-              style={{
-                width: 8,
-                height: 8,
-                borderRadius: "50%",
-                background: STATUS[m.status],
-                flexShrink: 0,
-              }}
-            />
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </aside>
   )

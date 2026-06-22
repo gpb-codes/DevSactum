@@ -77,7 +77,7 @@ export default function Login() {
   const passwordStrength = getPasswordStrength(form.password)
 
   return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden p-6 w-full"
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden p-6 w-full animate-fade-in"
       style={{ background: "linear-gradient(135deg, #020617 0%, #0c0a1d 50%, #020617 100%)" }}
     >
       {/* Animated gradient orbs */}

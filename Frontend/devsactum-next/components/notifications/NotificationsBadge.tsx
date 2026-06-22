@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState } from "react"
+import { motion, AnimatePresence } from "motion/react"
 import { Bell, X, CheckCheck } from "lucide-react"
 import { useNotifications, type NotificationType } from "@/context/NotificationsContext"
 import { useNav } from "@/context/NavContext"
@@ -47,10 +48,18 @@ export function NotificationsBadge() {
         )}
       </button>
 
-      {open && (
-        <>
+      <AnimatePresence>
+        {open && (
+          <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-full mt-2 w-[340px] bg-bg-surface border border-border rounded-[14px] shadow-xl z-50 animate-scale-in overflow-hidden">
+          <motion.div
+            key="notif-dropdown"
+            initial={{ opacity: 0, y: -8, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -8, scale: 0.96 }}
+            transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
+            className="absolute right-0 top-full mt-2 w-[340px] bg-bg-surface border border-border rounded-[14px] shadow-xl z-50 overflow-hidden"
+          >
             <div className="flex items-center justify-between px-4 py-3 border-b border-border">
               <span className="text-[12px] font-bold text-text-h">Notificaciones</span>
               {unreadCount > 0 && (
@@ -96,9 +105,10 @@ export function NotificationsBadge() {
                 Ver todas
               </button>
             </div>
-          </div>
+          </motion.div>
         </>
-      )}
+        )}
+      </AnimatePresence>
     </div>
   )
 }

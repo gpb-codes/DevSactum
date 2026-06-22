@@ -1,6 +1,7 @@
 "use client"
 
 import React from "react"
+import { motion } from "motion/react"
 import { cn } from "@/lib/utils"
 
 interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -28,7 +29,7 @@ export function Card({
     <div
       className={cn(
         "bg-bg-surface border border-border rounded-[14px]",
-        hover && "transition-all duration-200 cursor-pointer hover:border-accent-border",
+        hover && "transition-all duration-200 cursor-pointer hover:border-accent-border hover:-translate-y-0.5",
         accent && "border-accent-border bg-accent-bg",
         PADDING[padding],
         className

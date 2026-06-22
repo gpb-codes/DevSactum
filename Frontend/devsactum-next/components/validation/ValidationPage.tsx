@@ -40,7 +40,7 @@ export default function ValidationPage() {
   const passedAssessments = ASSESSMENTS.filter(a => a.passed).length
 
   return (
-    <div className="px-6 py-6 max-w-[900px] mx-auto">
+    <div className="px-6 py-6 max-w-[900px] mx-auto animate-fade-in">
       <section className="mb-6">
         <div className="flex items-center gap-2 mb-3">
           <Shield size={16} className="text-accent" strokeWidth={2} />
@@ -54,7 +54,7 @@ export default function ValidationPage() {
         </p>
       </section>
 
-      <div className="grid grid-cols-4 gap-3 mb-6">
+      <div className="grid grid-cols-4 gap-3 mb-6 animate-stagger">
         {[
           { label: "Certificaciones", value: `${earnedCerts}/${CERTIFICATIONS.length}`, icon: Award, color: "text-accent" },
           { label: "Assessments", value: `${passedAssessments}/${ASSESSMENTS.length}`, icon: Code2, color: "text-success" },
@@ -84,7 +84,7 @@ export default function ValidationPage() {
       </div>
 
       {activeTab === "certs" && (
-        <div className="flex flex-col gap-3 animate-fade-in">
+        <div className="flex flex-col gap-3 animate-stagger">
           {CERTIFICATIONS.map(cert => {
             const s = STATUS_CONFIG[cert.status]
             const StatusIcon = s.icon
@@ -121,7 +121,7 @@ export default function ValidationPage() {
       )}
 
       {activeTab === "assessments" && (
-        <div className="flex flex-col gap-3 animate-fade-in">
+        <div className="flex flex-col gap-3 animate-stagger">
           {ASSESSMENTS.map(a => (
             <div key={a.id} className="bg-bg-surface border border-border rounded-[14px] p-5 hover:border-accent-border transition-all">
               <div className="flex items-center gap-4">

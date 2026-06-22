@@ -3,6 +3,7 @@
 import React, { useState } from "react"
 import { Terminal, Layers, Zap, Globe, Search, TrendingUp, Users, Star, ArrowUpRight, Flame } from "lucide-react"
 import { useToast } from "@/components/ui/Toast"
+import { GradientHeading } from "@/components/ui/gradient-heading"
 
 type FilterKey = "All" | "Rust" | "Web3" | "Backend" | "UI/UX" | "AI/ML" | "Cloud"
 
@@ -54,12 +55,12 @@ export default function ExplorePage() {
   }
 
   return (
-    <div className="px-6 py-6 max-w-[820px] mx-auto">
+    <div className="px-6 py-6 max-w-[820px] mx-auto animate-fade-in">
 
       {/* Hero */}
       <section className="mb-8">
         <div className="flex items-center gap-2 mb-3">
-          <div className="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse-slow" />
+          <div className="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse" />
           <span className="text-[10px] font-bold uppercase tracking-[1.5px] text-text opacity-60">Explorar</span>
         </div>
         <h1 className="text-[42px] font-black tracking-[-2px] text-text-h leading-[1.05] mb-3">
@@ -169,12 +170,11 @@ export default function ExplorePage() {
                 Ver todo <ArrowUpRight size={11} strokeWidth={2} />
               </button>
             </div>
-            <div className="flex flex-col gap-2.5">
-              {TRENDING_COMMUNITIES.map((c, idx) => (
+            <div className="flex flex-col gap-2.5 animate-stagger">
+              {TRENDING_COMMUNITIES.map((c) => (
                 <div
                   key={c.name}
-                  className="bg-bg-surface border border-border rounded-[14px] p-4 flex items-center gap-4 hover:border-accent-border transition-all duration-200 cursor-pointer animate-fade-in"
-                  style={{ animationDelay: `${idx * 50}ms` }}
+                  className="bg-bg-surface border border-border rounded-[14px] p-4 flex items-center gap-4 hover:border-accent-border hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
                 >
                   <div
                     className="w-11 h-11 rounded-[10px] flex items-center justify-center shrink-0"
@@ -216,12 +216,11 @@ export default function ExplorePage() {
               <Star size={14} className="text-accent" strokeWidth={2} />
               <span className="text-[11px] font-bold uppercase tracking-[1.5px] text-text opacity-60">Posts más vistos</span>
             </div>
-            <div className="flex flex-col gap-2">
-              {TRENDING_POSTS.map((p, idx) => (
+            <div className="flex flex-col gap-2 animate-stagger">
+              {TRENDING_POSTS.map((p) => (
                 <div
                   key={p.rank}
-                  className="flex items-center gap-3.5 py-3.5 border-b border-border cursor-pointer hover:opacity-80 transition-opacity animate-fade-in"
-                  style={{ animationDelay: `${idx * 40}ms` }}
+                  className="flex items-center gap-3.5 py-3.5 border-b border-border cursor-pointer hover:opacity-80 transition-opacity"
                 >
                   <span className="text-[20px] font-black text-text opacity-20 w-6 text-center shrink-0 font-mono">
                     {p.rank}
@@ -244,12 +243,11 @@ export default function ExplorePage() {
               <Users size={14} className="text-accent" strokeWidth={2} />
               <span className="text-[11px] font-bold uppercase tracking-[1.5px] text-text opacity-60">Seguir devs</span>
             </div>
-            <div className="flex flex-col gap-3">
-              {DEVS_TO_FOLLOW.map((dev, idx) => (
+            <div className="flex flex-col gap-3 animate-stagger">
+              {DEVS_TO_FOLLOW.map((dev) => (
                 <div
                   key={dev.handle}
-                  className="bg-bg-surface border border-border rounded-[14px] p-4 animate-fade-in"
-                  style={{ animationDelay: `${idx * 60}ms` }}
+                  className="bg-bg-surface border border-border rounded-[14px] p-4"
                 >
                   <div className="flex items-center gap-3 mb-3">
                     <div

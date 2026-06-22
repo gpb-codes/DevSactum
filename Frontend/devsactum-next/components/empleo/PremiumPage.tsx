@@ -14,6 +14,7 @@ import { PayPalCheckout, PlanCard, OrderHistory } from "@/components/ui/PayPalCh
 import { PLANS } from "@/services/payments"
 import type { PayPalPlan } from "@/services/payments"
 import type { PremiumFeature } from "@/types"
+import { GradientHeading } from "@/components/ui/gradient-heading"
 
 const ICON_MAP: Record<string, React.ElementType> = {
   star: Star, brain: Brain, chart: BarChart3, filter: Filter,
@@ -77,7 +78,7 @@ export default function PremiumPage() {
   }
 
   return (
-    <div className="px-6 py-6 max-w-[900px] mx-auto">
+    <div className="px-6 py-6 max-w-[900px] mx-auto animate-fade-in">
       {/* Hero */}
       <section className="mb-10 text-center">
         <div className="flex items-center justify-center gap-2 mb-3">
@@ -138,7 +139,7 @@ export default function PremiumPage() {
           <Sparkles size={14} className="text-accent" strokeWidth={2} />
           <span className="text-[11px] font-bold uppercase tracking-[1.5px] text-text opacity-60">12 Features Premium</span>
         </div>
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-3 gap-3 animate-stagger">
           {PREMIUM_FEATURES.map((f, idx) => <FeatureCard key={f.id} feature={f} idx={idx} />)}
         </div>
       </section>
@@ -188,8 +189,8 @@ export default function PremiumPage() {
 
       {/* FAQ */}
       <section className="mb-8">
-        <h2 className="text-[18px] font-black text-text-h m-0 mb-5">Preguntas frecuentes</h2>
-        <div className="flex flex-col gap-3">
+        <GradientHeading variant="accent" size="xs" className="mb-5">Preguntas frecuentes</GradientHeading>
+        <div className="flex flex-col gap-3 animate-stagger-fast">
           {[
             { q: "¿Puedo cambiar de plan después?", a: "Sí, puedes actualizar o reducir tu plan en cualquier momento. Los cambios se aplican al siguiente ciclo de facturación." },
             { q: "¿Hay contrato permanente?", a: "No. Todos los planes son mes a mes sin compromiso. Puedes cancelar cuando quieras." },

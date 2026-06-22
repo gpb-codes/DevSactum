@@ -5,6 +5,7 @@ import { ExternalLink, Terminal, Shield, Database, MessageSquare, Heart, UserPlu
 import { useNav } from "@/context/NavContext"
 import { useJobAuth } from "@/context/JobAuthContext"
 import { PremiumGate, PremiumBadge } from "@/components/ui/PremiumGate"
+import { GradientHeading } from "@/components/ui/gradient-heading"
 
 const REPOS = [
   { name: "lumina-engine",  desc: "High-performance async runtime for WebAssembly modules in edge environments.", lang: "Rust", langColor: "#f97316", stars: "12.4k", forks: "892",  Icon: Terminal, wide: false },
@@ -34,7 +35,7 @@ export default function ProfilePage() {
   const isPremium = user?.isPremium ?? false
 
   return (
-    <div className="px-6 py-6 max-w-[1100px] mx-auto">
+    <div className="px-6 py-6 max-w-[1100px] mx-auto animate-fade-in">
 
       {/* Hero banner */}
       <header className="bg-bg-surface border border-border rounded-[14px] overflow-hidden mb-6 relative min-h-[320px]">
@@ -138,12 +139,12 @@ export default function ProfilePage() {
           {/* Repositorios */}
           <section className="bg-bg-surface border border-border rounded-[14px] p-5">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-[13px] font-extrabold uppercase tracking-[1.5px] text-text-h m-0">Top Repositories</h2>
+              <GradientHeading variant="accent" size="xs" className="m-0">Top Repositories</GradientHeading>
               <button className="flex items-center gap-1 bg-transparent border-none text-accent text-[11px] font-bold cursor-pointer">
                 View GitHub <ExternalLink size={11} strokeWidth={2} />
               </button>
             </div>
-            <div className="grid grid-cols-2 gap-2.5">
+            <div className="grid grid-cols-2 gap-2.5 animate-stagger-fast">
               {REPOS.map((r) => (
                 <div key={r.name} className={`bg-bg-hover border border-border rounded-[10px] p-4 cursor-pointer transition-colors duration-150 hover:border-accent-border ${r.wide ? "col-span-2" : "col-span-1"}`}>
                   <div className="flex justify-between mb-2.5">
@@ -166,7 +167,7 @@ export default function ProfilePage() {
 
           {/* Recent Insights */}
           <section className="bg-bg-surface border border-border rounded-[14px] p-5">
-            <h2 className="text-[13px] font-extrabold uppercase tracking-[1.5px] text-text-h m-0 mb-5">Recent Insights</h2>
+            <GradientHeading variant="warm" size="xs" className="m-0 mb-5">Recent Insights</GradientHeading>
             <div className="flex flex-col">
               {POSTS.map((p, i) => (
                 <article key={p.title} className={`flex gap-4 py-5 relative pl-7 ${i < POSTS.length - 1 ? "border-b border-border" : ""}`}>
@@ -187,7 +188,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Columna derecha — sidebar */}
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 animate-stagger">
 
           {/* Stats seguidores */}
           <div className="bg-bg-surface border border-border rounded-[14px] p-5">
@@ -204,10 +205,10 @@ export default function ProfilePage() {
           {/* Contacto rápido - PREMIUM */}
           <PremiumGate featureName="Contacto directo" showBlur={true}>
             <div className="bg-bg-surface border border-border rounded-[14px] p-5">
-              <div className="text-[10px] font-extrabold uppercase tracking-[1.5px] text-text mb-3 flex items-center gap-2">
+              <GradientHeading variant="accent" size="xs" className="m-0 mb-3 flex items-center gap-2">
                 Contacto Directo
                 {!isPremium && <Lock size={10} className="text-accent" strokeWidth={2.5} />}
-              </div>
+              </GradientHeading>
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2 text-[12px] text-text-h">
                   <Mail size={12} strokeWidth={2} /> alex.volkov@devsanctum.io
@@ -224,7 +225,7 @@ export default function ProfilePage() {
 
           {/* Trust score */}
           <div className="bg-bg-surface border border-border rounded-[14px] p-5 text-center">
-            <div className="text-[10px] font-extrabold uppercase tracking-[1.5px] text-text mb-4">Network Reputation</div>
+            <GradientHeading variant="cool" size="xs" className="m-0 mb-4">Network Reputation</GradientHeading>
             <div className="relative w-[110px] h-[110px] mx-auto mb-3">
               <svg width="110" height="110" viewBox="0 0 110 110">
                 <circle cx="55" cy="55" r="46" fill="none" stroke="var(--color-bg-hover)" strokeWidth="8"/>
@@ -242,7 +243,7 @@ export default function ProfilePage() {
 
           {/* Heatmap de actividad */}
           <div className="bg-bg-surface border border-border rounded-[14px] p-5">
-            <div className="text-[10px] font-extrabold uppercase tracking-[1.5px] text-text mb-3">Global Activity</div>
+            <GradientHeading variant="warm" size="xs" className="m-0 mb-3">Global Activity</GradientHeading>
             <div className="grid grid-cols-7 gap-[3px]">
               {HEATMAP.map((v, i) => (
                 <div key={i} className="aspect-square rounded-[3px]" style={{ background: v === 0 ? "var(--color-bg-hover)" : `rgba(196,154,255,${v / 100})` }} />
@@ -253,7 +254,7 @@ export default function ProfilePage() {
 
           {/* Stack proficiency */}
           <div className="bg-bg-surface border border-border rounded-[14px] p-5">
-            <div className="text-[10px] font-extrabold uppercase tracking-[1.5px] text-text mb-3.5">Stack Proficiency</div>
+            <GradientHeading variant="primary" size="xs" className="m-0 mb-3.5">Stack Proficiency</GradientHeading>
             <div className="flex flex-col gap-3">
               {SKILLS.map((s) => (
                 <div key={s.label}>

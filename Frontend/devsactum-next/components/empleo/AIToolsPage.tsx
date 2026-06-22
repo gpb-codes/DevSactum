@@ -14,6 +14,7 @@ import {
   aiService, type AIMatch, type AIJobRecommendation,
   type AIResumeAnalysis, type AISkillGap,
 } from "@/services/ai"
+import { GradientHeading } from "@/components/ui/gradient-heading"
 
 type Tab = "matching" | "resume" | "skill-gap" | "insights"
 
@@ -174,7 +175,7 @@ export default function AIToolsPage() {
   }
 
   return (
-    <div className="px-6 py-6 max-w-[900px] mx-auto">
+    <div className="px-6 py-6 max-w-[900px] mx-auto animate-fade-in">
       {/* Header */}
       <section className="mb-6">
         <div className="flex items-center gap-2 mb-3">
@@ -236,7 +237,7 @@ export default function AIToolsPage() {
           {matches.length > 0 && (
             <>
               <h3 className="text-[11px] font-bold uppercase tracking-[1.5px] text-text opacity-60 mb-3">Mejores candidatos para Senior Rust Engineer</h3>
-              <div className="flex flex-col gap-3 mb-6">
+              <div className="flex flex-col gap-3 mb-6 animate-stagger">
                 {matches.map(m => <MatchCard key={m.developerId} match={m} />)}
               </div>
             </>
@@ -245,7 +246,7 @@ export default function AIToolsPage() {
           {recommendations.length > 0 && (
             <>
               <h3 className="text-[11px] font-bold uppercase tracking-[1.5px] text-text opacity-60 mb-3">Empleos recomendados para ti</h3>
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-3 animate-stagger">
                 {recommendations.map(r => <JobRecCard key={r.jobId} rec={r} />)}
               </div>
             </>
@@ -292,7 +293,7 @@ export default function AIToolsPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3 mb-5">
+              <div className="grid grid-cols-2 gap-3 mb-5 animate-stagger">
                 {Object.entries(resumeAnalysis.sections).map(([key, val]) => (
                   <div key={key} className="bg-bg-hover border border-border rounded-[10px] p-3">
                     <div className="text-[10px] font-bold uppercase tracking-[1px] text-text opacity-60 mb-1">{key}</div>
@@ -403,7 +404,7 @@ export default function AIToolsPage() {
       {/* Insights */}
       {tab === "insights" && (
         <div className="animate-fade-in">
-          <div className="grid grid-cols-3 gap-3 mb-6">
+          <div className="grid grid-cols-3 gap-3 mb-6 animate-stagger">
             {[
               { label: "Ofertas activas", value: "10", icon: Code2, color: "text-accent" },
               { label: "Devs activos", value: "2.4k", icon: Users, color: "text-secondary" },
@@ -419,7 +420,7 @@ export default function AIToolsPage() {
 
           <div className="bg-bg-surface border border-border rounded-[14px] p-5">
             <h3 className="text-[14px] font-extrabold text-text-h m-0 mb-4">Tendencias del Mercado IA</h3>
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-3 animate-stagger-fast">
               {[
                 { skill: "Rust", demand: "+45%", salary: "$145k", trend: "up" },
                 { skill: "AI/ML", demand: "+62%", salary: "$165k", trend: "up" },

@@ -7,6 +7,7 @@ import { useToast } from "@/components/ui/Toast"
 import { MOCK_JOBS } from "@/lib/mock-jobs"
 import { getApplyJobId } from "@/lib/apply-state"
 import type { JobListing } from "@/types"
+import { GradientHeading } from "@/components/ui/gradient-heading"
 
 function formatSalary(min: number, max: number, currency: string, type: string) {
   if (type === "internship") return `$${(min / 1000).toFixed(0)}k/mo`
@@ -58,7 +59,7 @@ export default function PostulacionPage() {
   }
 
   return (
-    <div className="px-6 py-6 max-w-[820px] mx-auto">
+    <div className="px-6 py-6 max-w-[820px] mx-auto animate-fade-in">
       {/* Back */}
       <button
         onClick={() => setActivePage("Bolsa de Empleo")}
@@ -68,7 +69,7 @@ export default function PostulacionPage() {
         Volver a ofertas
       </button>
 
-      <div className="grid lg:grid-cols-[1fr_360px] gap-6">
+      <div className="grid lg:grid-cols-[1fr_360px] gap-6 animate-stagger">
         {/* Form */}
         <div>
           <div className="flex items-center gap-2 mb-2">

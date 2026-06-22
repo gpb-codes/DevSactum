@@ -1,6 +1,7 @@
 "use client"
 
 import React from "react"
+import { motion } from "motion/react"
 import { cn } from "@/lib/utils"
 
 type Variant = "primary" | "secondary" | "ghost" | "danger" | "outline"
@@ -44,7 +45,7 @@ export function Button({
       disabled={disabled || loading}
       className={cn(
         "inline-flex items-center justify-center font-bold border cursor-pointer",
-        "transition-all duration-150 disabled:opacity-40 disabled:cursor-not-allowed",
+        "transition-all duration-150 disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.97] hover:scale-[1.02]",
         VARIANTS[variant],
         SIZES[size],
         className
