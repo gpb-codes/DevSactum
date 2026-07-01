@@ -5,6 +5,7 @@ import {
   Terminal, Zap, Layers, Cloud, Plus,
   MessageSquare, Share2, ArrowUpRight, Users,
 } from "lucide-react"
+import { useNav } from "@/context/NavContext"
 
 const FILTERS = ["Todas", "Rust", "Web3", "TypeScript", "Cloud"]
 
@@ -54,6 +55,7 @@ const CONTRIBUTORS = [
 ]
 
 export default function Comunidades() {
+  const { setActivePage } = useNav()
   const [activeFilter, setActiveFilter] = useState("Todas")
   const [joined, setJoined] = useState<Record<string, boolean>>({})
 
@@ -229,7 +231,8 @@ export default function Comunidades() {
         <p className="text-[13px] text-text leading-[1.7] mb-5">
           Actualiza a Sanctum Pro para colectivos privados e integraciones ilimitadas de repositorios.
         </p>
-        <button className="w-full bg-text-h text-bg border-none rounded-[10px] py-3.5 text-[11px] font-black uppercase tracking-[2px] cursor-pointer hover:opacity-90 transition-opacity duration-150">
+        <button onClick={() => setActivePage("Membresía Dev")}
+          className="w-full bg-text-h text-bg border-none rounded-[10px] py-3.5 text-[11px] font-black uppercase tracking-[2px] cursor-pointer hover:opacity-90 transition-opacity duration-150">
           Ir a Premium
         </button>
       </section>

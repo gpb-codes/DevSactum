@@ -26,6 +26,8 @@ const ReputationPage    = dynamic(() => import("@/components/reputation/Reputati
 const NosotrosPage      = dynamic(() => import("@/components/about/NosotrosPage"),                { ...opts, ssr: false })
 const ContactPage       = dynamic(() => import("@/components/about/ContactPage"),                 { ...opts, ssr: false })
 const PostulacionPage   = dynamic(() => import("@/components/empleo/PostulacionPage"),            { ...opts, ssr: false })
+const MemberProPage     = dynamic(() => import("@/components/empleo/MemberProPage"),              { ...opts, ssr: false })
+const RecruiterProPage  = dynamic(() => import("@/components/empleo/RecruiterProPage"),           { ...opts, ssr: false })
 
 export default function PageRenderer() {
   const { activePage } = useNav()
@@ -51,6 +53,8 @@ export default function PageRenderer() {
     case "Nosotros":          return <NosotrosPage />
     case "Contáctanos":       return <ContactPage />
     case "Postulación":       return <PostulacionPage />
+    case "Membresía Dev":     return <MemberProPage />
+    case "Membresía Reclutador": return <RecruiterProPage />
     default:                  return <Feed />
   }
 }

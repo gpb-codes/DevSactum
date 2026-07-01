@@ -19,6 +19,8 @@ export type Page =
   | "Nosotros"
   | "Contáctanos"
   | "Postulación"
+  | "Membresía Dev"
+  | "Membresía Reclutador"
 
 export type NotificationType = "like" | "comment" | "follow" | "mention" | "share"
 

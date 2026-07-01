@@ -10,6 +10,8 @@ export type Page =
   | "Perfil"
   | "Notificaciones"
   | "Configuración"
+  | "Membresía Dev"
+  | "Membresía Reclutador"
 
 // ─── Notifications ────────────────────────────────────────────────────────────
 

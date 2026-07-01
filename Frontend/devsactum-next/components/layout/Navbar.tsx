@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "motion/react"
 import {
   Terminal, Compass, Users, Bookmark, MessageCircle,
   User, Settings, Bell, ChevronLeft, ChevronRight, Sparkles, Hash, Briefcase, Brain,
-  Code2, DollarSign, Shield, Award, Building2, Phone,
+  Code2, DollarSign, Shield, Award, Building2, Phone, Crown,
 } from "lucide-react"
 import { useNav } from "@/context/NavContext"
 import type { Page } from "@/types"
@@ -38,6 +38,13 @@ const NAV_SECTIONS: {
       { name: "Comunidades", Icon: Users,         badge: 3 },
       { name: "Guardados",   Icon: Bookmark               },
       { name: "Chat",        Icon: MessageCircle, badge: 5 },
+    ],
+  },
+  {
+    label: "Pro",
+    items: [
+      { name: "Membresía Dev",        Icon: Crown,     color: "text-accent"   },
+      { name: "Membresía Reclutador", Icon: Building2, color: "text-tertiary" },
     ],
   },
   {
