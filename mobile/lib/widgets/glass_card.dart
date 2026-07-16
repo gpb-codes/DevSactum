@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class GlassCard extends StatelessWidget {
@@ -19,35 +20,39 @@ class GlassCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bg = isDark ? const Color(0x1AFFFFFF) : const Color(0xB3FFFFFF);
+    final borderColor = isDark ? const Color(0x2FFFFFFF) : const Color(0x2F000000);
+
+    final inner = Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(borderRadius),
+        child: Padding(
+          padding: padding ?? const EdgeInsets.all(16),
+          child: child,
+        ),
+      ),
+    );
 
     return Container(
       margin: margin ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0x1AFFFFFF) : const Color(0xB3FFFFFF),
+        color: bg,
         borderRadius: BorderRadius.circular(borderRadius),
-        border: Border.all(
-          color: isDark ? const Color(0x2FFFFFFF) : const Color(0x2F000000),
-          width: 0.5,
-        ),
+        border: Border.all(color: borderColor, width: 0.5),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(borderRadius),
-        child: BackdropFilter(
-          filter: isDark
-              ? (ColorFilter.mode(Colors.black.withValues(alpha: 0.2), BlendMode.srcOver))
-              : (ColorFilter.mode(Colors.white.withValues(alpha: 0.3), BlendMode.srcOver)),
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: onTap,
-              borderRadius: BorderRadius.circular(borderRadius),
-              child: Padding(
-                padding: padding ?? const EdgeInsets.all(16),
-                child: child,
+        child: kIsWeb
+            ? inner
+            : BackdropFilter(
+                filter: ColorFilter.mode(
+                  isDark ? Colors.black.withValues(alpha: 0.2) : Colors.white.withValues(alpha: 0.3),
+                  BlendMode.srcOver,
+                ),
+                child: inner,
               ),
-            ),
-          ),
-        ),
       ),
     );
   }

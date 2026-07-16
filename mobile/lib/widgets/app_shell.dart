@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/nav_provider.dart';
@@ -231,26 +232,37 @@ class _GlassBottomNav extends StatelessWidget {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(24),
-        child: BackdropFilter(
-          filter: isDark ? (ColorFilter.mode(Colors.black.withValues(alpha: 0.5), BlendMode.srcOver)) : (ColorFilter.mode(Colors.white.withValues(alpha: 0.7), BlendMode.srcOver)),
-          child: BottomNavigationBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            type: BottomNavigationBarType.fixed,
-            currentIndex: _tabs.indexWhere((t) => t.page == currentPage).clamp(0, _tabs.length - 1),
-            selectedItemColor: const Color(0xFF7C3AED),
-            unselectedItemColor: Colors.grey[500],
-            onTap: (i) => onTap(_tabs[i].page),
-            items: _tabs.map((t) {
-              final isNotif = t.page == 'Notificaciones';
-              return BottomNavigationBarItem(
-                icon: isNotif ? Badge(isLabelVisible: unread > 0, label: Text('$unread'), child: Icon(t.icon)) : Icon(t.icon),
-                label: t.page,
-              );
-            }).toList(),
-          ),
-        ),
+        child: _navbar(context, isDark),
       ),
+    );
+  }
+
+  Widget _navbar(BuildContext context, bool isDark) {
+    final nav = BottomNavigationBar(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      type: BottomNavigationBarType.fixed,
+      currentIndex: _tabs.indexWhere((t) => t.page == currentPage).clamp(0, _tabs.length - 1),
+      selectedItemColor: const Color(0xFF7C3AED),
+      unselectedItemColor: Colors.grey[500],
+      onTap: (i) => onTap(_tabs[i].page),
+      items: _tabs.map((t) {
+        final isNotif = t.page == 'Notificaciones';
+        return BottomNavigationBarItem(
+          icon: isNotif ? Badge(isLabelVisible: unread > 0, label: Text('$unread'), child: Icon(t.icon)) : Icon(t.icon),
+          label: t.page,
+        );
+      }).toList(),
+    );
+
+    if (kIsWeb) return nav;
+
+    return BackdropFilter(
+      filter: ColorFilter.mode(
+        isDark ? Colors.black.withValues(alpha: 0.5) : Colors.white.withValues(alpha: 0.7),
+        BlendMode.srcOver,
+      ),
+      child: nav,
     );
   }
 }
