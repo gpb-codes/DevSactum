@@ -1,14 +1,17 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 func main() {
@@ -17,9 +20,15 @@ func main() {
 		port = "8000"
 	}
 
+	db := initDB()
+	defer db.Close()
+
 	r := chi.NewRouter()
+	r.Use(middleware.RequestID)
+	r.Use(middleware.RealIP)
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
+	r.Use(middleware.Timeout(30 * time.Second))
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"*"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
@@ -28,91 +37,40 @@ func main() {
 	}))
 
 	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("OK"))
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`{"status":"ok"}`))
 	})
 
 	r.Route("/api/v1", func(r chi.Router) {
-		r.Mount("/posts", postRoutes())
-		r.Mount("/communities", communityRoutes())
-		r.Mount("/reputation", reputationRoutes())
+		r.Mount("/posts", postRouter(db))
+		r.Mount("/communities", communityRouter(db))
+		r.Mount("/reputation", reputationRouter(db))
 	})
 
-	log.Printf("Go API running on port %s", port)
-	http.ListenAndServe(":"+port, r)
-}
+	server := &http.Server{
+		Addr:         ":" + port,
+		Handler:      r,
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 15 * time.Second,
+		IdleTimeout:  60 * time.Second,
+	}
 
-func postRoutes() http.Handler {
-	r := chi.NewRouter()
-	r.Get("/", listPosts)
-	r.Get("/{id}", getPost)
-	r.Get("/user/{userId}", listUserPosts)
-	r.Get("/tag/{tag}", listPostsByTag)
-	return r
-}
+	go func() {
+		log.Printf("Go API listening on port %s", port)
+		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("Server error: %v", err)
+		}
+	}()
 
-func communityRoutes() http.Handler {
-	r := chi.NewRouter()
-	r.Get("/", listCommunities)
-	r.Get("/{id}", getCommunity)
-	return r
-}
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+	log.Println("Shutting down server...")
 
-func reputationRoutes() http.Handler {
-	r := chi.NewRouter()
-	r.Get("/user/{userId}", getReputationProfile)
-	r.Get("/user/{userId}/history", getReputationHistory)
-	r.Get("/leaderboard", getLeaderboard)
-	return r
-}
-
-// Handler stubs - will be implemented with DB queries
-
-func listPosts(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte(`{"posts":[]}`))
-}
-
-func getPost(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte(`{"post":{}}`))
-}
-
-func listUserPosts(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte(`{"posts":[]}`))
-}
-
-func listPostsByTag(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte(`{"posts":[]}`))
-}
-
-func listCommunities(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte(`{"communities":[]}`))
-}
-
-func getCommunity(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte(`{"community":{}}`))
-}
-
-func getReputationProfile(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte(`{"profile":{}}`))
-}
-
-func getReputationHistory(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte(`{"events":[]}`))
-}
-
-func getLeaderboard(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte(`{"leaderboard":[]}`))
-}
-
-func initDB() *pgxpool.Pool {
-	// Will be implemented with actual DB connection
-	return nil
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	if err := server.Shutdown(ctx); err != nil {
+		log.Fatalf("Server forced shutdown: %v", err)
+	}
+	log.Println("Server stopped")
 }
