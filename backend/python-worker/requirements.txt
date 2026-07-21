@@ -1,5 +1,6 @@
 aio-pika==9.5.3
 asyncpg==0.30.0
+aiormq==6.8.1
 minio==7.2.15
 pydantic==2.10.4
 pydantic-settings==2.7.1
