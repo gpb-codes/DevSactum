@@ -1,11 +1,14 @@
 "use client"
 
-import React, { useState } from "react"
-import { ExternalLink, Terminal, Shield, Database, MessageSquare, Heart, UserPlus, Mail, Star, GitFork, Lock, Eye, EyeOff } from "lucide-react"
+import React, { useState, useEffect } from "react"
+import { ExternalLink, Terminal, Shield, Database, MessageSquare, Heart, UserPlus, Mail, Star, GitFork, Lock, Eye, EyeOff, Loader2 } from "lucide-react"
 import { useNav } from "@/context/NavContext"
 import { useJobAuth } from "@/context/JobAuthContext"
 import { PremiumGate, PremiumBadge } from "@/components/ui/PremiumGate"
 import { GradientHeading } from "@/components/ui/gradient-heading"
+import { postService, type Post } from "@/services/posts"
+import { reputationService, type ReputationProfile } from "@/services/reputation"
+import { authService } from "@/services/auth"
 
 const REPOS = [
   { name: "lumina-engine",  desc: "High-performance async runtime for WebAssembly modules in edge environments.", lang: "Rust", langColor: "#f97316", stars: "12.4k", forks: "892",  Icon: Terminal, wide: false },
@@ -13,12 +16,9 @@ const REPOS = [
   { name: "vector-db-core", desc: "Core engine for vector similarity search using HNSW indexing and SIMD acceleration.", lang: "C++", langColor: "#f87171", stars: "28.1k", forks: "1.4k", Icon: Database, wide: true  },
 ]
 
-const POSTS = [
-  { title: "Why We Migrated Our Edge Runtime to Rust: A Deep Dive into Memory Safety", date: "Oct 24, 2023", text: "After three years of managing a complex C++ codebase for our edge nodes, the technical debt of manual memory management reached a breaking point.", comments: 42, likes: "1.2k", active: true },
-  { title: "The Future of Decentralized Infrastructure and the Death of Monoliths",   date: "Sep 12, 2023", text: "Distributed systems are often harder than they need to be. By leveraging modern networking protocols like QUIC, we can rethink how services discover and talk to each other.", comments: 18, likes: "843", active: false },
-]
+const TAG_FALLBACKS = ["Rust", "Go", "Kubernetes", "Wasm", "eBPF"]
 
-const SKILLS = [
+const SKILLS_FALLBACK = [
   { label: "Distributed Logic",  pct: 98 },
   { label: "Kernel Programming", pct: 92 },
   { label: "Cloud Native Ops",   pct: 85 },
@@ -26,13 +26,99 @@ const SKILLS = [
 
 const HEATMAP = [0, 20, 40, 0, 60, 10, 100, 0, 0, 30, 50, 20, 0, 10, 40, 80, 20, 0, 10, 20, 100]
 
+const BIO_FALLBACK = "Building resilient infrastructure at global scale. Contributor to various open-source kernel modules and low-latency networking protocols. Minimalist by design, architect by trade."
+
+const CONTACT_FALLBACK = {
+  email: "alex.volkov@devsanctum.io",
+  website: "alexvolkov.dev",
+  github: "github.com/alexvolkov",
+  location: "San Francisco, CA (UTC-8)",
+}
+
+function formatDate(iso: string) {
+  const d = new Date(iso)
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+}
+
+function postTitle(content: string) {
+  const trimmed = content.trim()
+  const idx = trimmed.indexOf("\n")
+  const first = idx > 0 ? trimmed.slice(0, idx) : trimmed
+  return first.length > 70 ? first.slice(0, 70) + "..." : first
+}
+
 export default function ProfilePage() {
   const { setActivePage } = useNav()
   const { user } = useJobAuth()
   const [following, setFollowing] = useState(false)
   const [showContact, setShowContact] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [profile, setProfile] = useState<Record<string, any> | null>(null)
+  const [reputation, setReputation] = useState<ReputationProfile | null>(null)
+  const [userPosts, setUserPosts] = useState<Post[]>([])
 
   const isPremium = user?.isPremium ?? false
+
+  const initials = user?.initials ?? "AV"
+  const displayName = (profile?.display_name as string) || user?.name || "Alex Volkov"
+  const roleTitle = reputation?.title || "Principal Distributed Systems Architect"
+  const bio = (profile?.bio as string) || reputation?.bio || BIO_FALLBACK
+  const tags = reputation?.stack?.length ? reputation.stack : TAG_FALLBACKS
+  const trustScore = reputation?.score ?? 99
+  const scorePercent = Math.min(Math.max(trustScore, 0), 100)
+  const ringDashoffset = 289 - (289 * scorePercent) / 100
+
+  const contactEmail = (profile?.email as string) || CONTACT_FALLBACK.email
+  const contactWebsite = (profile?.website as string) || CONTACT_FALLBACK.website
+  const contactGithub = (profile?.github as string) || CONTACT_FALLBACK.github
+  const contactLocation = (profile?.location as string) || CONTACT_FALLBACK.location
+
+  const skills = reputation?.stack?.length
+    ? reputation.stack.map((s, i) => ({
+        label: s,
+        pct: Math.max(70, 96 - i * 10),
+      }))
+    : SKILLS_FALLBACK
+
+  const sortedPosts = [...userPosts].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  )
+  const mostRecentDate = sortedPosts.length > 0 ? sortedPosts[0].createdAt : null
+
+  useEffect(() => {
+    if (!user?.id) {
+      setLoading(false)
+      return
+    }
+
+    const load = async () => {
+      setLoading(true)
+      try {
+        const [profileData, repData, postsData] = await Promise.all([
+          authService.getProfile(user.id).catch(() => null),
+          reputationService.getProfile(user.id).catch(() => null),
+          postService.getByUser(user.id).catch(() => [] as Post[]),
+        ])
+        if (profileData) setProfile(profileData as Record<string, any>)
+        if (repData) setReputation(repData)
+        if (postsData) setUserPosts(postsData)
+      } catch (err) {
+        console.error("Failed to load profile data:", err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    load()
+  }, [user?.id])
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="w-8 h-8 text-accent animate-spin" />
+      </div>
+    )
+  }
 
   return (
     <div className="px-6 py-6 max-w-[1100px] mx-auto animate-fade-in">
@@ -52,14 +138,14 @@ export default function ProfilePage() {
         <div className="px-7 pb-7 relative">
           <div className="flex items-end gap-5 -mt-14">
             <div className="w-[100px] h-[100px] rounded-[14px] bg-accent-bg border-[3px] border-bg-surface flex items-center justify-center text-[32px] font-black text-accent shrink-0">
-              AV
+              {initials}
             </div>
             <div className="pb-1">
               <div className="flex items-center gap-2 mb-1">
-                <h1 className="text-[28px] font-black tracking-[-1px] text-text-h m-0">Alex Volkov</h1>
+                <h1 className="text-[28px] font-black tracking-[-1px] text-text-h m-0">{displayName}</h1>
                 {!isPremium && <PremiumBadge />}
               </div>
-              <p className="text-[12px] text-accent font-bold m-0">Principal Distributed Systems Architect</p>
+              <p className="text-[12px] text-accent font-bold m-0">{roleTitle}</p>
             </div>
             <div className="ml-auto flex gap-2 pb-1">
               <button
@@ -79,12 +165,10 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          <p className="text-[13px] text-text leading-[1.7] max-w-[600px] mt-3.5 mb-3.5">
-            Building resilient infrastructure at global scale. Contributor to various open-source kernel modules and low-latency networking protocols. Minimalist by design, architect by trade.
-          </p>
+          <p className="text-[13px] text-text leading-[1.7] max-w-[600px] mt-3.5 mb-3.5">{bio}</p>
 
           <div className="flex gap-2 flex-wrap">
-            {["Rust", "Go", "Kubernetes", "Wasm", "eBPF"].map((tag) => (
+            {tags.map((tag) => (
               <span key={tag} className="bg-accent-bg text-accent border border-accent-border text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-[1px]">
                 {tag}
               </span>
@@ -118,19 +202,19 @@ export default function ProfilePage() {
               <div className={`flex flex-col gap-3 ${!showContact && !isPremium ? "blur-[4px] select-none" : ""}`}>
                 <div className="flex items-center gap-3">
                   <Mail size={14} className="text-text opacity-50" strokeWidth={1.8} />
-                  <span className="text-[13px] text-text-h">alex.volkov@devsanctum.io</span>
+                  <span className="text-[13px] text-text-h">{contactEmail}</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <ExternalLink size={14} className="text-text opacity-50" strokeWidth={1.8} />
-                  <span className="text-[13px] text-accent">alexvolkov.dev</span>
+                  <span className="text-[13px] text-accent">{contactWebsite}</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <Terminal size={14} className="text-text opacity-50" strokeWidth={1.8} />
-                  <span className="text-[13px] text-text-h font-mono">github.com/alexvolkov</span>
+                  <span className="text-[13px] text-text-h font-mono">{contactGithub}</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <Shield size={14} className="text-text opacity-50" strokeWidth={1.8} />
-                  <span className="text-[13px] text-text-h">San Francisco, CA (UTC-8)</span>
+                  <span className="text-[13px] text-text-h">{contactLocation}</span>
                 </div>
               </div>
             </div>
@@ -169,20 +253,26 @@ export default function ProfilePage() {
           <section className="bg-bg-surface border border-border rounded-[14px] p-5">
             <GradientHeading variant="warm" size="xs" className="m-0 mb-5">Recent Insights</GradientHeading>
             <div className="flex flex-col">
-              {POSTS.map((p, i) => (
-                <article key={p.title} className={`flex gap-4 py-5 relative pl-7 ${i < POSTS.length - 1 ? "border-b border-border" : ""}`}>
-                  <div className={`absolute left-0 top-6 w-3 h-3 rounded-full border-2 ${p.active ? "bg-accent border-accent" : "bg-border border-border"}`} />
-                  <div>
-                    <div className={`text-[10px] font-bold uppercase tracking-[1px] mb-2 ${p.active ? "text-accent" : "text-text"}`}>{p.date}</div>
-                    <h3 className="text-[16px] font-extrabold text-text-h leading-[1.35] m-0 mb-2 cursor-pointer hover:text-accent transition-colors duration-150">{p.title}</h3>
-                    <p className="text-[12px] text-text leading-[1.65] m-0 mb-3">{p.text}</p>
-                    <div className="flex gap-4">
-                      <span className="flex items-center gap-1 text-[11px] font-bold text-text"><MessageSquare size={13} strokeWidth={1.8} /> {p.comments}</span>
-                      <span className="flex items-center gap-1 text-[11px] font-bold text-text"><Heart size={13} strokeWidth={1.8} /> {p.likes}</span>
+              {sortedPosts.length === 0 && (
+                <p className="text-[12px] text-text italic">No posts yet.</p>
+              )}
+              {sortedPosts.map((p, i) => {
+                const isActive = p.createdAt === mostRecentDate
+                return (
+                  <article key={p.id} className={`flex gap-4 py-5 relative pl-7 ${i < sortedPosts.length - 1 ? "border-b border-border" : ""}`}>
+                    <div className={`absolute left-0 top-6 w-3 h-3 rounded-full border-2 ${isActive ? "bg-accent border-accent" : "bg-border border-border"}`} />
+                    <div>
+                      <div className={`text-[10px] font-bold uppercase tracking-[1px] mb-2 ${isActive ? "text-accent" : "text-text"}`}>{formatDate(p.createdAt)}</div>
+                      <h3 className="text-[16px] font-extrabold text-text-h leading-[1.35] m-0 mb-2 cursor-pointer hover:text-accent transition-colors duration-150">{postTitle(p.content)}</h3>
+                      <p className="text-[12px] text-text leading-[1.65] m-0 mb-3">{p.content}</p>
+                      <div className="flex gap-4">
+                        <span className="flex items-center gap-1 text-[11px] font-bold text-text"><MessageSquare size={13} strokeWidth={1.8} /> {p.comments}</span>
+                        <span className="flex items-center gap-1 text-[11px] font-bold text-text"><Heart size={13} strokeWidth={1.8} /> {p.likes}</span>
+                      </div>
                     </div>
-                  </div>
-                </article>
-              ))}
+                  </article>
+                )
+              })}
             </div>
           </section>
         </div>
@@ -193,7 +283,7 @@ export default function ProfilePage() {
           {/* Stats seguidores */}
           <div className="bg-bg-surface border border-border rounded-[14px] p-5">
             <div className="flex justify-around">
-              {[["4.8k", "Followers"], ["124", "Following"], ["1.4k", "Posts"]].map(([val, lbl]) => (
+              {[["4.8k", "Followers"], ["124", "Following"], [`${sortedPosts.length}`, "Posts"]].map(([val, lbl]) => (
                 <div key={lbl} className="text-center">
                   <div className="text-[20px] font-black text-text-h tracking-[-0.5px]">{val}</div>
                   <div className="text-[10px] font-bold uppercase tracking-[1px] text-text mt-0.5">{lbl}</div>
@@ -211,13 +301,13 @@ export default function ProfilePage() {
               </GradientHeading>
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2 text-[12px] text-text-h">
-                  <Mail size={12} strokeWidth={2} /> alex.volkov@devsanctum.io
+                  <Mail size={12} strokeWidth={2} /> {contactEmail}
                 </div>
                 <div className="flex items-center gap-2 text-[12px] text-text-h">
-                  <ExternalLink size={12} strokeWidth={2} /> alexvolkov.dev
+                  <ExternalLink size={12} strokeWidth={2} /> {contactWebsite}
                 </div>
                 <div className="flex items-center gap-2 text-[12px] text-text-h">
-                  <Terminal size={12} strokeWidth={2} /> github.com/alexvolkov
+                  <Terminal size={12} strokeWidth={2} /> {contactGithub}
                 </div>
               </div>
             </div>
@@ -230,11 +320,11 @@ export default function ProfilePage() {
               <svg width="110" height="110" viewBox="0 0 110 110">
                 <circle cx="55" cy="55" r="46" fill="none" stroke="var(--color-bg-hover)" strokeWidth="8"/>
                 <circle cx="55" cy="55" r="46" fill="none" stroke="var(--color-accent)" strokeWidth="8"
-                  strokeDasharray="289" strokeDashoffset="29"
+                  strokeDasharray="289" strokeDashoffset={ringDashoffset}
                   strokeLinecap="round" transform="rotate(-90 55 55)"/>
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-[26px] font-black text-text-h">99</span>
+                <span className="text-[26px] font-black text-text-h">{scorePercent}</span>
                 <span className="text-[9px] font-bold uppercase tracking-[1px] text-accent">Trust</span>
               </div>
             </div>
@@ -249,14 +339,14 @@ export default function ProfilePage() {
                 <div key={i} className="aspect-square rounded-[3px]" style={{ background: v === 0 ? "var(--color-bg-hover)" : `rgba(196,154,255,${v / 100})` }} />
               ))}
             </div>
-            <p className="text-[10px] text-text font-mono mt-2.5">1,402 contributions in the last year</p>
+            <p className="text-[10px] text-text font-mono mt-2.5">{userPosts.length} contributions in the last year</p>
           </div>
 
           {/* Stack proficiency */}
           <div className="bg-bg-surface border border-border rounded-[14px] p-5">
             <GradientHeading variant="primary" size="xs" className="m-0 mb-3.5">Stack Proficiency</GradientHeading>
             <div className="flex flex-col gap-3">
-              {SKILLS.map((s) => (
+              {skills.map((s) => (
                 <div key={s.label}>
                   <div className="flex justify-between text-[10px] font-mono text-text uppercase mb-1">
                     <span>{s.label}</span><span>{s.pct}%</span>

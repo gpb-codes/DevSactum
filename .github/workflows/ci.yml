@@ -1,29 +1,66 @@
-name: CI
+name: CI/CD
 
 on:
   push:
-    branches: [main]
+    branches: [main, develop]
   pull_request:
     branches: [main]
 
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
 jobs:
-  web:
+  lint:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./Frontend/devsactum-next
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: "npm"
-          cache-dependency-path: ./Frontend/devsactum-next/package-lock.json
+          cache: npm
+          cache-dependency-path: |
+            Frontend/devsactum-next/package-lock.json
+            backend/nestjs-api/package-lock.json
       - run: npm ci
+        working-directory: ./Frontend/devsactum-next
       - run: npm run lint
-      - run: npm run build
+        working-directory: ./Frontend/devsactum-next
+      - run: npm ci
+        working-directory: ./backend/nestjs-api
+      - run: npm run lint
+        working-directory: ./backend/nestjs-api
 
-  go-api:
+  test-nestjs:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: devsactum_test
+          POSTGRES_USER: devsactum
+          POSTGRES_PASSWORD: devsactum
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    defaults:
+      run:
+        working-directory: ./backend/nestjs-api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: ./backend/nestjs-api/package-lock.json
+      - run: npm ci
+      - run: npm test
+
+  test-go:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -36,9 +73,11 @@ jobs:
           cache-dependency-path: ./backend/go-api/go.sum
       - run: go mod download
       - run: go vet ./...
+      - run: go build -o /dev/null .
 
-  nestjs-api:
+  build-nestjs:
     runs-on: ubuntu-latest
+    needs: [lint, test-nestjs]
     defaults:
       run:
         working-directory: ./backend/nestjs-api
@@ -47,7 +86,23 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: "npm"
+          cache: npm
           cache-dependency-path: ./backend/nestjs-api/package-lock.json
+      - run: npm ci
+      - run: npm run build
+
+  build-web:
+    runs-on: ubuntu-latest
+    needs: [lint, test-nestjs]
+    defaults:
+      run:
+        working-directory: ./Frontend/devsactum-next
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: ./Frontend/devsactum-next/package-lock.json
       - run: npm ci
       - run: npm run build

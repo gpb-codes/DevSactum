@@ -1,63 +1,121 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import {
   Terminal, Zap, Layers, Cloud, Plus,
-  MessageSquare, Share2, ArrowUpRight, Users,
+  MessageSquare, Share2, ArrowUpRight, Users, Loader2,
 } from "lucide-react"
 import { useNav } from "@/context/NavContext"
+import { useToast } from "@/components/ui/Toast"
+import { communityService, Community } from "@/services/communities"
+import { postService, Post } from "@/services/posts"
+import { reputationService, LeaderboardEntry } from "@/services/reputation"
 
 const FILTERS = ["Todas", "Rust", "Web3", "TypeScript", "Cloud"]
 
-const TRENDING = [
-  {
-    id: 1, name: "Web3 Builders", badge: "Crecimiento más rápido", featured: true,
-    desc: "Construyendo el futuro descentralizado con Ethereum, Solana y contratos inteligentes en Rust.",
-    members: "12.4k", Icon: null, color: "text-accent", bg: "bg-accent-bg",
-  },
-  {
-    id: 2, name: "Rustaceans", members: "8.1k", online: "242",
-    Icon: Terminal, color: "text-accent", bg: "bg-bg-hover", featured: false, badge: "", desc: "",
-  },
-  {
-    id: 3, name: "Next.js Experts", members: "15.2k", online: "1.1k",
-    Icon: Zap, color: "text-tertiary", bg: "bg-bg-hover", featured: false, badge: "", desc: "",
-  },
-]
+const iconMap: Record<string, React.ElementType> = {
+  Terminal, Zap, Layers, Cloud, Code2: Terminal,
+}
 
-const MY_GROUPS = [
-  { name: "Go Microservices", role: "Arquitectos",    Icon: Terminal, members: "4.2k", count: "+12" },
-  { name: "Typescript Pro",   role: "Hub de lenguaje", Icon: Layers,  members: "21k",  count: "+55" },
-  { name: "K8s Masters",      role: "Cloud Nativo",   Icon: Cloud,    members: "3.8k", count: "+9"  },
-]
+function formatCount(n: number): string {
+  if (n >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, "") + "k"
+  return String(n)
+}
 
-const DISCUSSIONS = [
-  {
-    community: "Rustaceans", communityColor: "text-accent",
-    author: "@oxide_dev", time: "hace 4h",
-    title: "Análisis profundo de la gestión de memoria en v1.75: Lo que necesitas saber",
-    text: "La última versión trae mejoras significativas en cómo manejamos las asignaciones de memoria concurrentes.",
-    comments: 128, shares: 42,
-  },
-  {
-    community: "Next.js Experts", communityColor: "text-tertiary",
-    author: "@frontend_queen", time: "hace 8h",
-    title: "¿Son las Server Actions el clavo final para las librerías API del lado del cliente?",
-    text: "Con la estabilización de las Server Actions, la frontera entre cliente y servidor se difumina más que nunca.",
-    comments: 312, shares: 15,
-  },
-]
+function getInitials(name: string): string {
+  return name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()
+}
 
-const CONTRIBUTORS = [
-  { initials: "SC", name: "@sarah_codes", role: "Experta en Rust",  points: "+2.4k", color: "#c49aff", bg: "rgba(196,154,255,.15)" },
-  { initials: "DG", name: "@dev_guru",    role: "Gurú de Web3",     points: "+1.8k", color: "#ff94a8", bg: "rgba(255,148,168,.15)" },
-  { initials: "VS", name: "@v_scale",     role: "Arquitecto",       points: "+1.1k", color: "#60a5fa", bg: "rgba(96,165,250,.12)" },
-]
+function getColor(name: string): string {
+  const colors = ["#c49aff", "#ff94a8", "#60a5fa", "#4ade80", "#f59e0b"]
+  return colors[name.charCodeAt(0) % colors.length]
+}
+
+function timeAgo(dateStr: string): string {
+  const diff = Date.now() - new Date(dateStr).getTime()
+  const hours = Math.floor(diff / 3600000)
+  if (hours < 1) return "hace " + Math.floor(diff / 60000) + "m"
+  if (hours < 24) return "hace " + hours + "h"
+  return "hace " + Math.floor(hours / 24) + "d"
+}
 
 export default function Comunidades() {
   const { setActivePage } = useNav()
+  const { success } = useToast()
   const [activeFilter, setActiveFilter] = useState("Todas")
   const [joined, setJoined] = useState<Record<string, boolean>>({})
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [communities, setCommunities] = useState<Community[]>([])
+  const [discussions, setDiscussions] = useState<Post[]>([])
+  const [contributors, setContributors] = useState<LeaderboardEntry[]>([])
+
+  useEffect(() => {
+    async function load() {
+      try {
+        setLoading(true)
+        setError(null)
+        const [commData, postsData, leaderData] = await Promise.all([
+          communityService.list(),
+          postService.getFeed(10),
+          reputationService.getLeaderboard(5),
+        ])
+        setCommunities(commData)
+        setDiscussions(postsData)
+        setContributors(leaderData)
+      } catch {
+        setError("Error al cargar comunidades")
+      } finally {
+        setLoading(false)
+      }
+    }
+    load()
+  }, [])
+
+  const handleJoin = async (id: string, name: string) => {
+    try {
+      await communityService.join(id)
+      setJoined(p => ({ ...p, [name]: true }))
+      success("Te has unido al colectivo")
+    } catch {
+      success("Error al unirse al colectivo")
+    }
+  }
+
+  const handleLeave = async (id: string, name: string) => {
+    try {
+      await communityService.leave(id)
+      setJoined(p => ({ ...p, [name]: false }))
+      success("Has abandonado el colectivo")
+    } catch {
+      success("Error al abandonar el colectivo")
+    }
+  }
+
+  const myGroups = communities.filter(c => joined[c.name])
+  const trending = communities.slice(0, 3)
+
+  if (loading) {
+    return (
+      <div className="px-6 py-6 max-w-[720px] mx-auto flex items-center justify-center min-h-[400px]">
+        <Loader2 size={32} className="text-accent animate-spin" />
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="px-6 py-6 max-w-[720px] mx-auto">
+        <div className="bg-bg-surface border border-border rounded-2xl p-8 text-center">
+          <p className="text-[14px] text-text mb-4">{error}</p>
+          <button onClick={() => window.location.reload()}
+            className="px-6 py-2.5 rounded-[10px] text-[12px] font-extrabold bg-accent text-[#1a0033] border border-accent cursor-pointer">
+            Reintentar
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="px-6 py-6 max-w-[720px] mx-auto">
@@ -99,44 +157,47 @@ export default function Comunidades() {
           <span className="text-[11px] font-extrabold text-accent uppercase tracking-[1px] cursor-pointer">Ver todo</span>
         </div>
 
-        {TRENDING.map((c) =>
-          c.featured ? (
-            <div key={c.id} className="bg-bg-surface border border-border rounded-2xl p-6 mb-3 relative">
-              <span className="bg-bg-hover text-accent border border-accent-border text-[9px] font-extrabold uppercase tracking-[1.5px] px-2.5 py-1 rounded-full inline-block mb-4">
-                {c.badge}
-              </span>
-              <div className="text-[36px] font-black tracking-[-1.5px] text-text-h mb-2.5">{c.name}</div>
-              <p className="text-[13px] text-text leading-[1.7] mb-5 max-w-[400px]">{c.desc}</p>
-              <div className="flex items-center justify-between flex-wrap gap-3">
-                <div className="flex items-center gap-1.5 text-[13px] font-bold text-text-h">
-                  <Users size={15} className="text-accent" strokeWidth={2} />
-                  {c.members} miembros
-                </div>
-                <button
-                  onClick={() => setJoined((p) => ({ ...p, [c.name]: !p[c.name] }))}
-                  className={`px-7 py-2.5 rounded-[10px] text-[12px] font-extrabold cursor-pointer transition-all duration-150 border border-accent ${
-                    joined[c.name] ? "bg-transparent text-accent" : "bg-accent text-[#1a0033]"
-                  }`}
-                >
-                  {joined[c.name] ? "Unido ✓" : "Unirse al colectivo"}
-                </button>
+        {trending.length > 0 && (
+          <div key={trending[0].id} className="bg-bg-surface border border-border rounded-2xl p-6 mb-3 relative">
+            <span className="bg-bg-hover text-accent border border-accent-border text-[9px] font-extrabold uppercase tracking-[1.5px] px-2.5 py-1 rounded-full inline-block mb-4">
+              Crecimiento más rápido
+            </span>
+            <div className="text-[36px] font-black tracking-[-1.5px] text-text-h mb-2.5">{trending[0].name}</div>
+            <p className="text-[13px] text-text leading-[1.7] mb-5 max-w-[400px]">{trending[0].description}</p>
+            <div className="flex items-center justify-between flex-wrap gap-3">
+              <div className="flex items-center gap-1.5 text-[13px] font-bold text-text-h">
+                <Users size={15} className="text-accent" strokeWidth={2} />
+                {formatCount(trending[0].memberCount)} miembros
               </div>
+              <button
+                onClick={() => joined[trending[0].name] ? handleLeave(trending[0].id, trending[0].name) : handleJoin(trending[0].id, trending[0].name)}
+                className={`px-7 py-2.5 rounded-[10px] text-[12px] font-extrabold cursor-pointer transition-all duration-150 border border-accent ${
+                  joined[trending[0].name] ? "bg-transparent text-accent" : "bg-accent text-[#1a0033]"
+                }`}
+              >
+                {joined[trending[0].name] ? "Unido ✓" : "Unirse al colectivo"}
+              </button>
             </div>
-          ) : (
+          </div>
+        )}
+
+        {trending.slice(1).map((c) => {
+          const Icon = iconMap[c.icon] || Terminal
+          return (
             <div key={c.id} className="bg-bg-surface border border-border rounded-2xl p-6 mb-3 flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div className={`w-12 h-12 rounded-[10px] ${c.bg} flex items-center justify-center shrink-0 ${c.color}`}>
-                  {c.Icon && <c.Icon size={20} strokeWidth={1.8} />}
+                <div className="w-12 h-12 rounded-[10px] bg-bg-hover flex items-center justify-center shrink-0 text-accent">
+                  <Icon size={20} strokeWidth={1.8} />
                 </div>
                 <div>
                   <div className="text-[20px] font-black tracking-[-0.5px] text-text-h mb-1">{c.name}</div>
-                  <div className="text-[12px] text-text">{c.members} miembros · {c.online} en línea</div>
+                  <div className="text-[12px] text-text">{formatCount(c.memberCount)} miembros · {c.onlineCount} en línea</div>
                 </div>
               </div>
               <ArrowUpRight size={18} className="text-text shrink-0" strokeWidth={1.8} />
             </div>
           )
-        )}
+        })}
       </section>
 
       {/* Mis grupos */}
@@ -146,25 +207,33 @@ export default function Comunidades() {
           <span className="text-[10px] font-extrabold uppercase tracking-[2px] text-text">Mis grupos</span>
         </div>
 
-        {MY_GROUPS.map(({ name, role, Icon, members, count }) => (
-          <div key={name} className="bg-bg-surface border border-border rounded-2xl p-6 mb-3 flex items-center justify-between">
-            <div className="flex items-center gap-3.5">
-              <div className="w-12 h-12 rounded-[10px] bg-bg-hover flex items-center justify-center shrink-0 text-accent">
-                <Icon size={18} strokeWidth={1.8} />
-              </div>
-              <div>
-                <div className="text-[15px] font-bold text-text-h mb-0.5">{name}</div>
-                <div className="text-[10px] font-extrabold uppercase tracking-[1px] text-text">{role}</div>
-              </div>
-            </div>
-            <div className="text-right">
-              <div className="text-[11px] font-bold text-text mb-0.5">{count} más</div>
-              <div className="text-[11px] text-text opacity-60">{members} mems</div>
-            </div>
+        {myGroups.length === 0 && (
+          <div className="bg-bg-surface border border-border rounded-2xl p-6 mb-3 text-center">
+            <p className="text-[13px] text-text">Únete a colectivos para verlos aquí</p>
           </div>
-        ))}
+        )}
 
-        {/* Crear colectivo */}
+        {myGroups.map((c) => {
+          const Icon = iconMap[c.icon] || Terminal
+          return (
+            <div key={c.id} className="bg-bg-surface border border-border rounded-2xl p-6 mb-3 flex items-center justify-between">
+              <div className="flex items-center gap-3.5">
+                <div className="w-12 h-12 rounded-[10px] bg-bg-hover flex items-center justify-center shrink-0 text-accent">
+                  <Icon size={18} strokeWidth={1.8} />
+                </div>
+                <div>
+                  <div className="text-[15px] font-bold text-text-h mb-0.5">{c.name}</div>
+                  <div className="text-[10px] font-extrabold uppercase tracking-[1px] text-text">{c.description ? c.description.slice(0, 30) : "Comunidad"}</div>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-[11px] font-bold text-text mb-0.5">+{c.onlineCount}</div>
+                <div className="text-[11px] text-text opacity-60">{formatCount(c.memberCount)} mems</div>
+              </div>
+            </div>
+          )
+        })}
+
         <div className="bg-transparent border-2 border-dashed border-border rounded-2xl flex flex-col items-center gap-2.5 p-7 cursor-pointer hover:border-accent-border transition-colors duration-150">
           <div className="w-11 h-11 rounded-full bg-bg-hover flex items-center justify-center">
             <Plus size={18} className="text-text" strokeWidth={2} />
@@ -180,49 +249,62 @@ export default function Comunidades() {
           <span className="text-[10px] font-extrabold uppercase tracking-[2px] text-text">Discusiones globales</span>
         </div>
 
-        {DISCUSSIONS.map((d) => (
-          <div key={d.title} className="bg-bg-surface border border-border rounded-2xl p-6 mb-3 flex flex-col gap-2.5">
-            <div className="flex items-center gap-1.5 text-[12px] font-bold flex-wrap">
-              <span className={d.communityColor}>{d.community}</span>
-              <span className="opacity-30 text-text">•</span>
-              <span className="text-text">Por <span className="text-text-h">{d.author}</span></span>
-              <span className="opacity-30 text-text">•</span>
-              <span className="text-text opacity-60">{d.time}</span>
+        {discussions.map((d) => {
+          const tag = d.tags?.[0] || "General"
+          const tagColors: Record<string, string> = {
+            Rust: "text-accent", Web3: "text-tertiary", TypeScript: "text-[#4ade80]",
+          }
+          return (
+            <div key={d.id} className="bg-bg-surface border border-border rounded-2xl p-6 mb-3 flex flex-col gap-2.5">
+              <div className="flex items-center gap-1.5 text-[12px] font-bold flex-wrap">
+                <span className={tagColors[tag] || "text-accent"}>{tag}</span>
+                <span className="opacity-30 text-text">•</span>
+                <span className="text-text">Por <span className="text-text-h">{d.authorName}</span></span>
+                <span className="opacity-30 text-text">•</span>
+                <span className="text-text opacity-60">{timeAgo(d.createdAt)}</span>
+              </div>
+              <div className="text-[20px] font-black tracking-[-0.5px] text-text-h leading-[1.3] cursor-pointer">
+                {d.content.length > 100 ? d.content.slice(0, 100) + "..." : d.content}
+              </div>
+              <p className="text-[13px] text-text leading-[1.7] m-0">{d.content}</p>
+              <div className="flex gap-5 mt-1">
+                <button className="flex items-center gap-1.5 bg-transparent border-none cursor-pointer text-[12px] font-bold text-text p-0">
+                  <MessageSquare size={15} strokeWidth={1.8} /> {d.comments}
+                </button>
+                <button className="flex items-center gap-1.5 bg-transparent border-none cursor-pointer text-[12px] font-bold text-text p-0">
+                  <Share2 size={15} strokeWidth={1.8} /> {d.shares}
+                </button>
+              </div>
             </div>
-            <div className="text-[20px] font-black tracking-[-0.5px] text-text-h leading-[1.3] cursor-pointer">{d.title}</div>
-            <p className="text-[13px] text-text leading-[1.7] m-0">{d.text}</p>
-            <div className="flex gap-5 mt-1">
-              <button className="flex items-center gap-1.5 bg-transparent border-none cursor-pointer text-[12px] font-bold text-text p-0">
-                <MessageSquare size={15} strokeWidth={1.8} /> {d.comments}
-              </button>
-              <button className="flex items-center gap-1.5 bg-transparent border-none cursor-pointer text-[12px] font-bold text-text p-0">
-                <Share2 size={15} strokeWidth={1.8} /> {d.shares}
-              </button>
-            </div>
-          </div>
-        ))}
+          )
+        })}
       </section>
 
       {/* Top contributors */}
       <section className="mb-12">
         <div className="text-[10px] font-extrabold uppercase tracking-[2px] text-accent mb-5">Mejores contribuidores</div>
-        {CONTRIBUTORS.map((c) => (
-          <div key={c.name} className="flex items-center justify-between py-3 border-b border-border cursor-pointer hover:opacity-80 transition-opacity duration-150">
-            <div className="flex items-center gap-3">
-              <div
-                className="w-10 h-10 rounded-full flex items-center justify-center text-[12px] font-bold"
-                style={{ background: c.bg, color: c.color }}
-              >
-                {c.initials}
+        {contributors.map((c) => {
+          const name = c.displayName || c.username
+          const initials = getInitials(name)
+          const color = getColor(name)
+          return (
+            <div key={c.userId} className="flex items-center justify-between py-3 border-b border-border cursor-pointer hover:opacity-80 transition-opacity duration-150">
+              <div className="flex items-center gap-3">
+                <div
+                  className="w-10 h-10 rounded-full flex items-center justify-center text-[12px] font-bold"
+                  style={{ background: `${color}22`, color }}
+                >
+                  {initials}
+                </div>
+                <div>
+                  <div className="text-[13px] font-extrabold text-text-h">@{c.username}</div>
+                  <div className="text-[10px] font-bold uppercase tracking-[1px] text-text">{c.level}</div>
+                </div>
               </div>
-              <div>
-                <div className="text-[13px] font-extrabold text-text-h">{c.name}</div>
-                <div className="text-[10px] font-bold uppercase tracking-[1px] text-text">{c.role}</div>
-              </div>
+              <span className="text-[13px] font-extrabold text-accent">+{c.score}</span>
             </div>
-            <span className="text-[13px] font-extrabold text-accent">{c.points}</span>
-          </div>
-        ))}
+          )
+        })}
       </section>
 
       {/* CTA Premium */}

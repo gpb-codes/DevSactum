@@ -8,72 +8,17 @@ import {
 import { useToast } from "@/components/ui/Toast"
 import { postService, type Post } from "@/services/posts"
 
-interface FeedMilestone {
-  quote: string
-  stat: string
-  statLabel: string
-  statCaption: string
+function timeAgo(dateStr: string): string {
+  const diff = Date.now() - new Date(dateStr).getTime()
+  const seconds = Math.floor(diff / 1000)
+  const minutes = Math.floor(seconds / 60)
+  const hours = Math.floor(minutes / 60)
+  const days = Math.floor(hours / 24)
+  if (days > 0) return `${days}d`
+  if (hours > 0) return `${hours}h`
+  if (minutes > 0) return `${minutes}m`
+  return "ahora"
 }
-
-interface FeedPost {
-  id: number
-  initials: string
-  name: string
-  handle: string
-  time: string
-  text: string
-  code?: string
-  codeFile?: string
-  tags?: string[]
-  milestone?: FeedMilestone
-  likes: number
-  comments: number
-  shares: number
-  liked: boolean
-  avatarColor: string
-  avatarBg: string
-}
-
-const POSTS: FeedPost[] = [
-  {
-    id: 1, initials: "JD", name: "James Dalton", handle: "@jdalton_dev", time: "2h",
-    text: "Optimizando el loop de hidratación para el nuevo reactive engine. Reducimos TTI un 40% usando un custom worker-thread scheduler. Miren la implementación core:",
-    code: `async function hydrate(root: Node) {\n  // Offload expensive diffing to Worker\n  const patch = await worker.computeDiff(root);\n\n  requestIdleCallback(() => {\n    applyPatch(root, patch);\n  });\n}`,
-    codeFile: "scheduler.ts",
-    likes: 1200, comments: 84, shares: 12, liked: false,
-    avatarColor: "#c49aff", avatarBg: "rgba(196,154,255,.15)",
-  },
-  {
-    id: 2, initials: "ER", name: "Elena Rivera", handle: "@elena_codes", time: "5h",
-    text: "Terminé la UI hardware-acelerada para el nuevo emulador de terminal. El tonal layering y los luminescent pulses se sienten mucho mejor que los bordes estándar.",
-    tags: ["Design System", "Rust", "WGPU"],
-    likes: 452, comments: 29, shares: 8, liked: true,
-    avatarColor: "#ff94a8", avatarBg: "rgba(255,148,168,.15)",
-  },
-  {
-    id: 3, initials: "SK", name: "Soren K.", handle: "@soren_kernel", time: "8h",
-    text: "",
-    milestone: {
-      quote: "Shipped v2.0 of the decentralized storage layer. 0% downtime during migration.",
-      stat: "142k", statLabel: "requests/s", statCaption: "Peak Throughput",
-    },
-    likes: 891, comments: 114, shares: 0, liked: false,
-    avatarColor: "#60a5fa", avatarBg: "rgba(96,165,250,.12)",
-  },
-  {
-    id: 4, initials: "MR", name: "María R.", handle: "@maria_oss", time: "12h",
-    text: "Finalmente entendí el ownership model de Rust después de 6 meses. El click que te da cuando todo hace sentido es increíble. Si están aprendiendo Rust, el libro de Jon Gjengset es OBLIGATORIO. No hay atajos en este lenguaje y eso es exactamente lo que lo hace hermoso.",
-    tags: ["Rust", "Learning"],
-    likes: 234, comments: 67, shares: 19, liked: false,
-    avatarColor: "#4ade80", avatarBg: "rgba(74,222,128,.12)",
-  },
-  {
-    id: 5, initials: "TS", name: "Tom Simons", handle: "@tsimons_dev", time: "1d",
-    text: "Hot take: La mayoría de microservicios deberían ser monolitos bien estructurados. La complejidad operacional de K8s + service mesh + distributed tracing no vale la pena para el 90% de los productos. Comiencen simple, escalen cuando el problema sea real.",
-    likes: 1876, comments: 312, shares: 88, liked: false,
-    avatarColor: "#f59e0b", avatarBg: "rgba(245,158,11,.12)",
-  },
-]
 
 function Composer({ onPost }: { onPost: (text: string) => void }) {
   const [text, setText] = useState("")
@@ -138,12 +83,10 @@ function Composer({ onPost }: { onPost: (text: string) => void }) {
 
 export default function Feed() {
   const { success } = useToast()
-  const [posts, setPosts]   = useState<FeedPost[]>(POSTS)
+  const [posts, setPosts]   = useState<Post[]>([])
   const [loading, setLoading] = useState(false)
-  const [likes, setLikes]   = useState<Record<number, { count: number; liked: boolean }>>(
-    Object.fromEntries(POSTS.map(p => [p.id, { count: p.likes, liked: p.liked }]))
-  )
-  const [commenting, setCommenting] = useState<number | null>(null)
+  const [likes, setLikes]   = useState<Record<string, { count: number; liked: boolean }>>({})
+  const [commenting, setCommenting] = useState<string | null>(null)
 
   useEffect(() => {
     loadPosts()
@@ -153,71 +96,37 @@ export default function Feed() {
     setLoading(true)
     try {
       const apiPosts = await postService.getFeed(20, 0)
-      if (apiPosts.length > 0) {
-        const mapped: FeedPost[] = apiPosts.map(p => ({
-          id: parseInt(p.id) || Date.now(),
-          initials: p.authorInitials,
-          name: p.authorName,
-          handle: p.authorHandle,
-          time: p.createdAt,
-          text: p.content,
-          code: p.codeSnippet,
-          codeFile: p.codeLanguage,
-          tags: p.tags,
-          likes: p.likes,
-          comments: p.comments,
-          shares: p.shares,
-          liked: p.liked,
-          avatarColor: p.authorColor,
-          avatarBg: p.authorBg,
-        }))
-        setPosts(mapped)
-        setLikes(Object.fromEntries(mapped.map(p => [p.id, { count: p.likes, liked: p.liked }])))
-      }
+      setPosts(apiPosts)
+      setLikes(Object.fromEntries(apiPosts.map(p => [p.id, { count: p.likes, liked: p.liked }])))
     } catch {
-      // Keep mock data as fallback
+      // API failed, show empty state
     } finally {
       setLoading(false)
     }
   }
   const [commentText, setCommentText] = useState("")
 
-  function toggleLike(id: number) {
+  function toggleLike(id: string) {
     setLikes(prev => ({
       ...prev,
       [id]: { count: prev[id].liked ? prev[id].count - 1 : prev[id].count + 1, liked: !prev[id].liked },
     }))
-    postService.like(String(id)).catch(() => {})
+    postService.like(id).catch(() => {})
   }
 
   async function handleNewPost(text: string) {
     try {
       const apiPost = await postService.create({ content: text })
-      const newPost: FeedPost = {
-        id: parseInt(apiPost.id) || Date.now(),
-        initials: apiPost.authorInitials,
-        name: apiPost.authorName,
-        handle: apiPost.authorHandle,
-        time: "ahora",
-        text: apiPost.content,
-        tags: apiPost.tags,
-        likes: 0,
-        comments: 0,
-        shares: 0,
-        liked: false,
-        avatarColor: apiPost.authorColor,
-        avatarBg: apiPost.authorBg,
-      }
-      setPosts(prev => [newPost, ...prev])
-      setLikes(prev => ({ ...prev, [newPost.id]: { count: 0, liked: false } }))
+      setPosts(prev => [apiPost, ...prev])
+      setLikes(prev => ({ ...prev, [apiPost.id]: { count: 0, liked: false } }))
       success("Post publicado", "Tu post es visible en el feed")
     } catch {
-      // Fallback to local
-      const newPost: FeedPost = {
-        id: Date.now(),
-        initials: "AV", name: "Alex Volkov", handle: "@alex_volkov", time: "ahora",
-        text, likes: 0, comments: 0, shares: 0, liked: false,
-        avatarColor: "#c49aff", avatarBg: "rgba(196,154,255,.15)",
+      const newPost: Post = {
+        id: String(Date.now()), content: text,
+        authorId: "local", authorName: "Alex Volkov", authorHandle: "@alex_volkov",
+        authorInitials: "AV", authorColor: "#c49aff", authorBg: "rgba(196,154,255,.15)",
+        tags: [], likes: 0, comments: 0, shares: 0, liked: false,
+        createdAt: new Date().toISOString(),
       }
       setPosts(prev => [newPost, ...prev])
       setLikes(prev => ({ ...prev, [newPost.id]: { count: 0, liked: false } }))
@@ -225,7 +134,7 @@ export default function Feed() {
     }
   }
 
-  function handleShare(id: number) {
+  function handleShare(id: string) {
     success("Enlace copiado", "El enlace del post fue copiado al portapapeles")
   }
 
@@ -239,7 +148,7 @@ export default function Feed() {
       <div className="flex items-center gap-2 px-6 pt-5">
         <div className="w-1.5 h-1.5 rounded-full bg-online animate-pulse shrink-0" />
         <span className="text-[10px] font-bold uppercase tracking-[1.2px] text-text opacity-60">
-          Actividad en vivo · 124 devs activos
+          Actividad en vivo
         </span>
       </div>
 
@@ -262,35 +171,35 @@ export default function Feed() {
       <div className="px-6 py-5 flex flex-col gap-0 animate-stagger">
         {posts.map((post) => (
           <article key={post.id}>
-            <div className={`py-6 ${(post as any).milestone ? "bg-bg-surface border border-border rounded-2xl p-5 mb-4" : "border-b border-border"}`}>
+            <div className="py-6 border-b border-border">
               <div className="flex gap-3.5">
                 {/* Avatar */}
                 <div
                   className="w-10 h-10 rounded-[10px] flex items-center justify-center text-[12px] font-bold shrink-0"
-                  style={{ background: post.avatarBg, color: post.avatarColor }}
+                  style={{ background: post.authorBg, color: post.authorColor }}
                 >
-                  {post.initials}
+                  {post.authorInitials}
                 </div>
 
                 <div className="flex-1 min-w-0">
                   {/* Header */}
                   <div className="flex justify-between items-start mb-2">
                     <div>
-                      <span className="text-[14px] font-bold text-text-h">{post.name}</span>
-                      <span className="text-[12px] text-text ml-2 opacity-60">{post.handle}</span>
-                      <span className="text-[11px] text-text opacity-40 ml-1.5">· {post.time}</span>
+                      <span className="text-[14px] font-bold text-text-h">{post.authorName}</span>
+                      <span className="text-[12px] text-text ml-2 opacity-60">{post.authorHandle}</span>
+                      <span className="text-[11px] text-text opacity-40 ml-1.5">· {timeAgo(post.createdAt)}</span>
                     </div>
                     <button className="bg-transparent border-none cursor-pointer text-text p-1 hover:text-text-h rounded-md hover:bg-bg-hover transition-colors">
                       <MoreHorizontal size={15} strokeWidth={1.8} />
                     </button>
                   </div>
 
-                  {post.text && (
-                    <p className="text-[13.5px] text-text leading-[1.7] mb-3">{post.text}</p>
+                  {post.content && (
+                    <p className="text-[13.5px] text-text leading-[1.7] mb-3">{post.content}</p>
                   )}
 
                   {/* Code block */}
-                  {post.code && (
+                  {post.codeSnippet && (
                     <div className="rounded-[10px] overflow-hidden border border-border mb-3.5">
                       <div className="bg-bg-hover px-3.5 py-2 flex justify-between items-center border-b border-border">
                         <div className="flex items-center gap-2">
@@ -299,7 +208,7 @@ export default function Feed() {
                             <div className="w-2.5 h-2.5 rounded-full bg-[#ffbd2e]" />
                             <div className="w-2.5 h-2.5 rounded-full bg-[#28c840]" />
                           </div>
-                          <span className="text-[10px] font-mono text-text opacity-60">{post.codeFile}</span>
+                          <span className="text-[10px] font-mono text-text opacity-60">{post.codeLanguage}</span>
                         </div>
                         <button
                           className="text-[10px] text-text opacity-50 bg-transparent border-none cursor-pointer hover:opacity-100 hover:text-accent transition-colors"
@@ -309,7 +218,7 @@ export default function Feed() {
                         </button>
                       </div>
                       <pre className="m-0 p-4 bg-black text-[12px] font-mono text-accent overflow-x-auto leading-[1.7]">
-                        <code>{post.code}</code>
+                        <code>{post.codeSnippet}</code>
                       </pre>
                     </div>
                   )}
@@ -322,23 +231,6 @@ export default function Feed() {
                           {tag}
                         </span>
                       ))}
-                    </div>
-                  )}
-
-                  {/* Milestone */}
-                  {post.milestone && (
-                    <div className="grid grid-cols-2 gap-2.5 mb-3.5">
-                      <div className="bg-bg-hover border border-border rounded-[10px] p-4 col-span-2">
-                        <span className="text-[9px] font-bold text-accent uppercase tracking-[1.5px] block mb-1.5">Milestone</span>
-                        <p className="text-[13px] text-text-h italic leading-[1.5] m-0">&ldquo;{post.milestone.quote}&rdquo;</p>
-                      </div>
-                      <div className="bg-bg-hover border border-border rounded-[10px] p-4">
-                        <div className="flex items-baseline gap-1.5">
-                          <span className="text-[26px] font-black text-text-h tracking-tight">{post.milestone.stat}</span>
-                          <span className="text-[11px] text-text">{post.milestone.statLabel}</span>
-                        </div>
-                        <span className="text-[9px] font-bold text-text uppercase tracking-[1px] mt-1 block">{post.milestone.statCaption}</span>
-                      </div>
                     </div>
                   )}
 

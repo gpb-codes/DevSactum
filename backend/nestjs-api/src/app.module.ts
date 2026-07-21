@@ -16,6 +16,8 @@ import { NotificationsModule } from './notifications/notifications.module'
 import { QueueModule } from './queue/queue.module'
 import { StorageModule } from './storage/storage.module'
 import { WebSocketModule } from './websocket/websocket.module'
+import { CacheModule } from './cache/cache.module'
+import { ExploreModule } from './explore/explore.module'
 
 @Module({
   imports: [
@@ -23,6 +25,7 @@ import { WebSocketModule } from './websocket/websocket.module'
       isGlobal: true,
       envFilePath: ['.env', '../.env'],
     }),
+    CacheModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -46,6 +49,7 @@ import { WebSocketModule } from './websocket/websocket.module'
     JobsModule,
     PaymentsModule,
     ReputationModule,
+    ExploreModule,
     NotificationsModule,
     QueueModule,
     StorageModule,
