@@ -1,0 +1,8 @@
+aio-pika==9.5.3
+asyncpg==0.30.0
+minio==7.2.15
+pydantic==2.10.4
+pydantic-settings==2.7.1
+httpx==0.28.1
+tenacity==9.0.0
+loguru==0.7.3

@@ -7,3 +7,12 @@ __pycache__/
 .venv/
 venv/
 pgdata/
+
+# Backend
+backend/nestjs-api/dist/
+backend/nestjs-api/node_modules/
+backend/go-api/server
+backend/go-api/server.exe
+backend/go-api/*.exe
+.idea/
+*.log
